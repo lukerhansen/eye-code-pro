@@ -31,12 +31,11 @@ export default async function PricingPage() {
         <div className="max-w-md">
           <PricingCard
             name="Professional"
-            price={basePrice?.unitAmount || 1200}
+            price={basePrice?.unitAmount || 1}
             interval={basePrice?.interval || 'month'}
             trialDays={basePrice?.trialPeriodDays || 7}
             features={[
-              'Complete eye care code database',
-              'Real-time claim validation',
+              'Lots of Benes',
               'Dedicated account manager',
             ]}
             priceId={basePrice?.id}
