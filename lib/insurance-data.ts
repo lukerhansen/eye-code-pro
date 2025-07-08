@@ -1,16 +1,31 @@
 // Insurance reimbursement rates by plan and code
 export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
+  //defaults to medicare if not specified
+  'Humana Choice': {
+    '92002': 75.21,
+    '92004': 137.27,
+    '92012': 68.81,
+    '92014': 101.88,
+    '99202': 68.99,
+    '99203': 102.58,
+    '99204': 145.40,
+    '99212': 40.72,
+    '99213': 55.77,
+    '99214': 87.55,
+    '99215': 127.67,
+    '99205': 184.46,
+  },
   Medicare: {
     '92002': 77.66,
     '92004': 137.33,
     '92012': 81.66,
     '92014': 115.94,
-    '99202': 67.2,
+    '99202': 67.20,
     '99203': 105.16,
     '99204': 158.02,
     '99205': 228.17,
     '99212': 52.82,
-    '99213': 85.8,
+    '99213': 85.80,
     '99214': 120.94,
     '99215': 185.64,
   },
@@ -26,49 +41,7 @@ export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99212': 41.68,
     '99213': 67.71,
     '99214': 95.44,
-    '99215': 134.1,
-  },
-  VA: {
-    '92002': 77.66,
-    '92004': 137.33,
-    '92012': 81.66,
-    '92014': 115.94,
-    '99202': 67.2,
-    '99203': 105.16,
-    '99204': 158.02,
-    '99205': 228.17,
-    '99212': 52.82,
-    '99213': 85.8,
-    '99214': 120.94,
-    '99215': 185.64,
-  },
-  'Humana Choice': {
-    '92002': 75.21,
-    '92004': 137.27,
-    '92012': 68.81,
-    '92014': 101.88,
-    '99202': 68.99,
-    '99203': 102.58,
-    '99204': 145.40,
-    '99212': 40.72,
-    '99213': 55.77,
-    '99214': 87.55,
-    '99215': 127.67,
-    '99205': 184.46,
-  },
-  'Humana Medicare': {
-    '92002': 77.66,
-    '92004': 137.33,
-    '92012': 81.66,
-    '92014': 115.94,
-    '99202': 67.2,
-    '99203': 105.16,
-    '99204': 158.02,
-    '99205': 228.17,
-    '99212': 52.82,
-    '99213': 85.8,
-    '99214': 120.94,
-    '99215': 185.64,
+    '99215': 134.10,
   },
 };
 
@@ -126,7 +99,14 @@ export function coversFullExam(insurancePlan: string): boolean {
 
 export function getReimbursement(insurancePlan: string, code: string | null | undefined): number {
   if (!code) return 0;
-  return CODE_REIMBURSEMENT[insurancePlan]?.[code] ?? 0;
+  
+  // Check if the insurance plan exists in CODE_REIMBURSEMENT
+  if (CODE_REIMBURSEMENT[insurancePlan]?.[code]) {
+    return CODE_REIMBURSEMENT[insurancePlan][code];
+  }
+  
+  // If insurance plan not found, use Medicare as default
+  return CODE_REIMBURSEMENT.Medicare?.[code] ?? 0;
 }
 
 export function getCodePair(patientType: 'new' | 'established', level: number): [string | null, string | null] {
