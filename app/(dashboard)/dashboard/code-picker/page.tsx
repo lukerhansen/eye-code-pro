@@ -11,12 +11,10 @@ const DOCTORS: Record<string, string> = {
   "Dr. Hillam": "DO",
 };
 
-const DIAGNOSIS_CODE_MAP: Record<string, string> = {
-  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)": "H52.13",
-  "Medical diagnosis": "Z01.00",
-};
-
-const DIAGNOSES = Object.keys(DIAGNOSIS_CODE_MAP);
+const DIAGNOSES = [
+  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)",
+  "Medical diagnosis",
+];
 
 export default function CodePickerPage() {
   const insuranceOptions = Object.keys(INSURANCE_PLANS);
@@ -67,7 +65,7 @@ export default function CodePickerPage() {
       if (!res.ok) {
         throw new Error(data.error || "Unknown error");
       }
-      const { recommendedCode, billingEntryId, debugInfo } = data;
+      const { recommendedCode, billingEntryId, debugInfo, diagnosisCode } = data;
 
       setBillingEntryId(billingEntryId ?? null);
       setIsFlagged(false);
@@ -78,8 +76,7 @@ export default function CodePickerPage() {
         return;
       }
 
-      const diagCode = DIAGNOSIS_CODE_MAP[diagnosis];
-      const codeDisplay = diagCode ? `${recommendedCode} – ${diagCode}` : recommendedCode;
+      const codeDisplay = diagnosisCode ? `${recommendedCode} – ${diagnosisCode}` : recommendedCode;
       setOutput(codeDisplay);
     } catch (err: any) {
       setOutput(`Error: ${err.message}`);

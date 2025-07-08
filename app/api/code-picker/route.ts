@@ -10,6 +10,11 @@ import {
   higherPayingCodeWithDebug,
 } from '@/lib/insurance-data';
 
+const DIAGNOSIS_CODE_MAP: Record<string, string> = {
+  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)": "H52.13",  
+  "Medical diagnosis": "Z01.00",
+};
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
@@ -37,6 +42,7 @@ export async function POST(req: NextRequest) {
     let rationale = '';
     let recommendedCode: string | null = null;
     let debugInfo: any = null;
+    let diagnosisCode: string | null = null;
 
     if (isOD && isMedicaid) {
       // OD on Medicaid always uses eye code (92)
@@ -50,6 +56,7 @@ export async function POST(req: NextRequest) {
       }
       if (!DIAGNOSIS_ELIGIBILITY[diagnosis]) {
         rationale += ' - vision diagnosis (code: H52.13)';
+        diagnosisCode = "H52.13";
       }
     } else {
       const [eyeCode, emCode] = getCodePair(patientType, level);
@@ -60,6 +67,8 @@ export async function POST(req: NextRequest) {
       const hasFreeExam = coversFullExam(insurancePlan) && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
+        diagnosisCode = "Z01.00"
+        //TDOO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
       
       // Add debugging information
@@ -86,7 +95,7 @@ export async function POST(req: NextRequest) {
       console.error('Failed to log billing entry', error);
     }
 
-    return NextResponse.json({ rationale, recommendedCode, billingEntryId, debugInfo });
+    return NextResponse.json({ rationale, recommendedCode, billingEntryId, debugInfo, diagnosisCode });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
