@@ -74,21 +74,10 @@ function ManageSubscription() {
 
 function TeamMembersSkeleton() {
   return (
-    <Card className="mb-8 h-[140px]">
+    <Card className="mb-8 h-[300px]">
       <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+        <CardTitle>Practice Staff</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="animate-pulse space-y-4 mt-1">
-          <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-gray-200"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 rounded"></div>
-              <div className="h-3 w-14 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
     </Card>
   );
 }
@@ -108,10 +97,10 @@ function TeamMembers() {
     return (
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>Practice Staff</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">No team members yet.</p>
+          <p className="text-muted-foreground">No practice staff added yet.</p>
         </CardContent>
       </Card>
     );
@@ -120,7 +109,7 @@ function TeamMembers() {
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+        <CardTitle>Practice Staff</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
@@ -128,15 +117,6 @@ function TeamMembers() {
             <li key={member.id} className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar>
-                  {/* 
-                    This app doesn't save profile images, but here
-                    is how you'd show them:
-
-                    <AvatarImage
-                      src={member.user.image || ''}
-                      alt={getUserDisplayName(member.user)}
-                    />
-                  */}
                   <AvatarFallback>
                     {getUserDisplayName(member.user)
                       .split(' ')
@@ -149,7 +129,7 @@ function TeamMembers() {
                     {getUserDisplayName(member.user)}
                   </p>
                   <p className="text-sm text-muted-foreground capitalize">
-                    {member.role}
+                    {member.role === 'owner' ? 'Practice Owner' : 'Staff Member'}
                   </p>
                 </div>
               </div>
@@ -181,7 +161,7 @@ function InviteTeamMemberSkeleton() {
   return (
     <Card className="h-[260px]">
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+        <CardTitle>Invite Staff Member</CardTitle>
       </CardHeader>
     </Card>
   );
@@ -198,7 +178,7 @@ function InviteTeamMember() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+        <CardTitle>Invite Staff Member</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={inviteAction} className="space-y-4">
@@ -210,7 +190,7 @@ function InviteTeamMember() {
               id="email"
               name="email"
               type="email"
-              placeholder="Enter email"
+              placeholder="Enter staff member's email"
               required
               disabled={!isOwner}
             />
@@ -225,11 +205,11 @@ function InviteTeamMember() {
             >
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+                <Label htmlFor="member">Staff Member</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Owner</Label>
+                <Label htmlFor="owner">Practice Owner</Label>
               </div>
             </RadioGroup>
           </div>
@@ -241,7 +221,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-teal-600 hover:bg-teal-700 text-white"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -252,7 +232,7 @@ function InviteTeamMember() {
             ) : (
               <>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Invite Member
+                Invite Staff Member
               </>
             )}
           </Button>
@@ -261,7 +241,7 @@ function InviteTeamMember() {
       {!isOwner && (
         <CardFooter>
           <p className="text-sm text-muted-foreground">
-            You must be a team owner to invite new members.
+            You must be a practice owner to invite new staff members.
           </p>
         </CardFooter>
       )}
@@ -272,7 +252,7 @@ function InviteTeamMember() {
 export default function SettingsPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
+      <h1 className="text-lg lg:text-2xl font-medium mb-6">Practice Management</h1>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
       </Suspense>

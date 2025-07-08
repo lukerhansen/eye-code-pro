@@ -4,15 +4,18 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 
-export function SubmitButton() {
+export function SubmitButton({ isPopular = false }: { isPopular?: boolean }) {
   const { pending } = useFormStatus();
 
   return (
     <Button
       type="submit"
       disabled={pending}
-      variant="outline"
-      className="w-full rounded-full"
+      className={`w-full rounded-full ${
+        isPopular
+          ? 'bg-teal-600 hover:bg-teal-700 text-white'
+          : 'border border-teal-600 text-teal-600 hover:bg-teal-50'
+      }`}
     >
       {pending ? (
         <>
@@ -21,7 +24,7 @@ export function SubmitButton() {
         </>
       ) : (
         <>
-          Get Started
+          Start Free Trial
           <ArrowRight className="ml-2 h-4 w-4" />
         </>
       )}
