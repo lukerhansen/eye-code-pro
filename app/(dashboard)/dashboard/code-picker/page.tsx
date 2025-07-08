@@ -24,10 +24,12 @@ const DOCTORS: Record<string, string> = {
   "Dr. Hillam": "DO",
 };
 
-const DIAGNOSES = [
-  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)",
-  "Medical diagnosis",
-];
+const DIAGNOSIS_CODE_MAP: Record<string, string> = {
+  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)": "H52.13",
+  "Medical diagnosis": "Z01.00",
+};
+
+const DIAGNOSES = Object.keys(DIAGNOSIS_CODE_MAP);
 
 export default function CodePickerPage() {
   const insuranceOptions = Object.keys(INSURANCE_PLANS);
@@ -75,12 +77,16 @@ export default function CodePickerPage() {
       if (!res.ok) {
         throw new Error(data.error || "Unknown error");
       }
-      const { rationale, recommendedCode } = data;
-      setOutput(
-        recommendedCode
-          ? `${rationale}\n\n→ Recommended CPT code: ${recommendedCode}`
-          : rationale
-      );
+      const { recommendedCode } = data;
+
+      if (!recommendedCode) {
+        setOutput("No CPT code available");
+        return;
+      }
+
+      const diagCode = DIAGNOSIS_CODE_MAP[diagnosis];
+      const codeDisplay = diagCode ? `${recommendedCode} – ${diagCode}` : recommendedCode;
+      setOutput(codeDisplay);
     } catch (err: any) {
       setOutput(`Error: ${err.message}`);
     }
@@ -202,7 +208,11 @@ export default function CodePickerPage() {
       <Button onClick={handleSubmit}>Get billing advice</Button>
 
       {/* Output */}
-      {output && <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded-md">{output}</pre>}
+      {output && (
+        <div className="mt-4 text-4xl md:text-6xl font-extrabold text-teal-600 text-center">
+          {output}
+        </div>
+      )}
     </div>
   );
 } 
