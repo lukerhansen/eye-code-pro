@@ -1,6 +1,13 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
-import { activityLogs, teamMembers, teams, users } from './schema';
+import {
+  activityLogs,
+  teamMembers,
+  teams,
+  users,
+  billingEntries,
+  type NewBillingEntry,
+} from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
@@ -97,6 +104,36 @@ export async function getActivityLogs() {
     .where(eq(activityLogs.userId, user.id))
     .orderBy(desc(activityLogs.timestamp))
     .limit(10);
+}
+
+// ---------------- Billing Entries ----------------
+
+export async function logBillingEntry(entry: Omit<NewBillingEntry, 'id' | 'userId' | 'createdAt'>) {
+  const user = await getUser();
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const newEntry: NewBillingEntry = {
+    ...entry,
+    userId: user.id,
+  } as NewBillingEntry;
+
+  await db.insert(billingEntries).values(newEntry);
+}
+
+export async function getBillingEntries(limit = 20) {
+  const user = await getUser();
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  return await db
+    .select()
+    .from(billingEntries)
+    .where(eq(billingEntries.userId, user.id))
+    .orderBy(desc(billingEntries.createdAt))
+    .limit(limit);
 }
 
 export async function getTeamForUser() {

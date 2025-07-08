@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   integer,
+  boolean,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -52,6 +53,23 @@ export const activityLogs = pgTable('activity_logs', {
   action: text('action').notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),
   ipAddress: varchar('ip_address', { length: 45 }),
+});
+
+// Billing history for code picker results
+export const billingEntries = pgTable('billing_entries', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id),
+  insurancePlan: varchar('insurance_plan', { length: 100 }).notNull(),
+  doctor: varchar('doctor', { length: 100 }).notNull(),
+  patientType: varchar('patient_type', { length: 20 }).notNull(),
+  level: integer('level').notNull(),
+  recommendedCode: varchar('recommended_code', { length: 20 }).notNull(),
+  diagnosis: varchar('diagnosis', { length: 255 }),
+  isEmergencyVisit: boolean('is_emergency_visit').notNull().default(false),
+  freeExamBilledLastYear: boolean('free_exam_billed_last_year').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const invitations = pgTable('invitations', {
@@ -112,6 +130,13 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   }),
 }));
 
+export const billingEntriesRelations = relations(billingEntries, ({ one }) => ({
+  user: one(users, {
+    fields: [billingEntries.userId],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
@@ -122,6 +147,8 @@ export type ActivityLog = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
 export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
+export type BillingEntry = typeof billingEntries.$inferSelect;
+export type NewBillingEntry = typeof billingEntries.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;

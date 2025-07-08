@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logBillingEntry } from '@/lib/db/queries';
 
 // Placeholder data duplicated from insurance_data.py (simplified for demo)
 const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
@@ -143,6 +144,23 @@ export async function POST(req: NextRequest) {
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
       }
+    }
+
+    // Save the billing entry for the current user
+    try {
+      await logBillingEntry({
+        insurancePlan,
+        doctor,
+        patientType,
+        level,
+        recommendedCode: recommendedCode ?? '',
+        diagnosis,
+        isEmergencyVisit,
+        freeExamBilledLastYear,
+      });
+    } catch (error) {
+      // Non-fatal – continue even if the log fails
+      console.error('Failed to log billing entry', error);
     }
 
     return NextResponse.json({ rationale, recommendedCode });
