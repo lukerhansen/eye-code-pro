@@ -5,12 +5,12 @@ import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
-  title: 'Next.js SaaS Starter',
-  description: 'Get started quickly with Next.js, Postgres, and Stripe.'
+  title: 'CodeSelect - Eye Care Insurance Code Platform',
+  description: 'Streamline your ophthalmology or optometry practice with AI-powered insurance code selection. Reduce claim denials, maximize reimbursements, and save hours of administrative work.',
 };
 
 export const viewport: Viewport = {
-  maximumScale: 1
+  maximumScale: 1,
 };
 
 const manrope = Manrope({ subsets: ['latin'] });

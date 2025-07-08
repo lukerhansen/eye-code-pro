@@ -13,38 +13,44 @@ export default async function PricingPage() {
   ]);
 
   const basePlan = products.find((product) => product.name === 'Base');
-  const plusPlan = products.find((product) => product.name === 'Plus');
-
   const basePrice = prices.find((price) => price.productId === basePlan?.id);
-  const plusPrice = prices.find((price) => price.productId === plusPlan?.id);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
-        <PricingCard
-          name={basePlan?.name || 'Base'}
-          price={basePrice?.unitAmount || 800}
-          interval={basePrice?.interval || 'month'}
-          trialDays={basePrice?.trialPeriodDays || 7}
-          features={[
-            'Unlimited Usage',
-            'Unlimited Workspace Members',
-            'Email Support',
-          ]}
-          priceId={basePrice?.id}
-        />
-        <PricingCard
-          name={plusPlan?.name || 'Plus'}
-          price={plusPrice?.unitAmount || 1200}
-          interval={plusPrice?.interval || 'month'}
-          trialDays={plusPrice?.trialPeriodDays || 7}
-          features={[
-            'Everything in Base, and:',
-            'Early Access to New Features',
-            '24/7 Support + Slack Access',
-          ]}
-          priceId={plusPrice?.id}
-        />
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Start Your CodeSelect Journey
+        </h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Optimize your ophthalmology or optometry practice with our comprehensive insurance code platform. 
+          Save time, reduce denials, and maximize your revenue.
+        </p>
+      </div>
+      
+      <div className="flex justify-center">
+        <div className="max-w-md">
+          <PricingCard
+            name="Professional"
+            price={basePrice?.unitAmount || 1}
+            interval={basePrice?.interval || 'month'}
+            trialDays={basePrice?.trialPeriodDays || 7}
+            features={[
+              'Lots of Benes',
+              'Dedicated account manager',
+            ]}
+            priceId={basePrice?.id}
+            isPopular={true}
+          />
+        </div>
+      </div>
+      
+      <div className="mt-16 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Built for Eye Care Professionals
+        </h2>
+        <p className="text-lg text-gray-600">
+          CodeSelect is designed specifically for ophthalmologists and optometrists who want to streamline their coding workflow and reduce administrative burden.
+        </p>
       </div>
     </main>
   );
@@ -57,6 +63,7 @@ function PricingCard({
   trialDays,
   features,
   priceId,
+  isPopular = false,
 }: {
   name: string;
   price: number;
@@ -64,31 +71,41 @@ function PricingCard({
   trialDays: number;
   features: string[];
   priceId?: string;
+  isPopular?: boolean;
 }) {
   return (
-    <div className="pt-6">
-      <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        with {trialDays} day free trial
-      </p>
-      <p className="text-4xl font-medium text-gray-900 mb-6">
-        ${price / 100}{' '}
-        <span className="text-xl font-normal text-gray-600">
-          per user / {interval}
-        </span>
-      </p>
-      <ul className="space-y-4 mb-8">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-start">
-            <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">{feature}</span>
-          </li>
-        ))}
-      </ul>
-      <form action={checkoutAction}>
-        <input type="hidden" name="priceId" value={priceId} />
-        <SubmitButton />
-      </form>
+    <div className={`relative pt-6 ${isPopular ? 'border-2 border-[#198bc4] rounded-lg' : ''}`}>
+      {isPopular && (
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <span className="bg-[#198bc4] text-white px-4 py-1 rounded-full text-sm font-medium">
+            Perfect Choice
+          </span>
+        </div>
+      )}
+      <div className={`${isPopular ? 'p-6' : 'pt-6'}`}>
+        <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          {trialDays} day free trial - no credit card required
+        </p>
+        <p className="text-4xl font-medium text-gray-900 mb-6">
+          ${price / 100}{' '}
+          <span className="text-xl font-normal text-gray-600">
+            per provider / {interval}
+          </span>
+        </p>
+        <ul className="space-y-4 mb-8">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-start">
+              <Check className="h-5 w-5 text-[#198bc4] mr-3 mt-0.5 flex-shrink-0" />
+              <span className="text-gray-700">{feature}</span>
+            </li>
+          ))}
+        </ul>
+        <form action={checkoutAction}>
+          <input type="hidden" name="priceId" value={priceId} />
+          <SubmitButton isPopular={isPopular} />
+        </form>
+      </div>
     </div>
   );
 }

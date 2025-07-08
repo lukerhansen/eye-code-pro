@@ -7,12 +7,12 @@ export function Terminal() {
   const [terminalStep, setTerminalStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const terminalSteps = [
-    'git clone https://github.com/nextjs/saas-starter',
-    'pnpm install',
-    'pnpm db:setup',
-    'pnpm db:migrate',
-    'pnpm db:seed',
-    'pnpm dev 🎉',
+    '$ codeselect --search "cataract surgery"',
+    '$ validate-claim --procedure 66984 --diagnosis H25.9',
+    '$ check-reimbursement --code 66984 --payer anthem',
+    '$ generate-report --month january --practice-id 12345',
+    '$ export-codes --format csv --date-range 2024-01-01:2024-12-31',
+    '$ revenue-optimization --complete ✨',
   ];
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function Terminal() {
       setTerminalStep((prev) =>
         prev < terminalSteps.length - 1 ? prev + 1 : prev
       );
-    }, 500);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [terminalStep]);
@@ -58,7 +58,7 @@ export function Terminal() {
               key={index}
               className={`${index > terminalStep ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
             >
-              <span className="text-green-400">$</span> {step}
+              <span className="text-teal-400">{step.split(' ')[0]}</span> {step.split(' ').slice(1).join(' ')}
             </div>
           ))}
         </div>
