@@ -10,7 +10,7 @@ export default function HomePage() {
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
                 Master Eye Care
-                <span className="block text-teal-600">Insurance Codes</span>
+                <span className="block text-[#198bc4]">Insurance Codes</span>
               </h1>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                 Streamline your ophthalmology or optometry practice with AI-powered insurance code selection. 
@@ -23,7 +23,7 @@ export default function HomePage() {
                 >
                   <Button
                     size="lg"
-                    className="text-lg rounded-full bg-teal-600 hover:bg-teal-700 text-white"
+                    className="text-lg rounded-full bg-[#198bc4] hover:bg-[#0f7ba8] text-white"
                   >
                     Start Saving Money
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -48,7 +48,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-teal-600 text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
                 <Eye className="h-6 w-6" />
               </div>
               <div className="mt-5">
@@ -63,7 +63,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-teal-600 text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
                 <Shield className="h-6 w-6" />
               </div>
               <div className="mt-5">
@@ -78,7 +78,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-teal-600 text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
                 <DollarSign className="h-6 w-6" />
               </div>
               <div className="mt-5">
@@ -111,7 +111,7 @@ export default function HomePage() {
               <a href="/pricing">
                 <Button
                   size="lg"
-                  className="text-lg rounded-full bg-teal-600 hover:bg-teal-700 text-white"
+                  className="text-lg rounded-full bg-[#198bc4] hover:bg-[#0f7ba8] text-white"
                 >
                   Get Started Today
                   <ArrowRight className="ml-3 h-6 w-6" />

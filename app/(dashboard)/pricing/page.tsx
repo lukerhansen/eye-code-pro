@@ -37,12 +37,7 @@ export default async function PricingPage() {
             features={[
               'Complete eye care code database',
               'Real-time claim validation',
-              'Advanced revenue optimization',
-              'Priority coding support',
-              'Custom reporting & analytics',
-              'Integration with practice management',
               'Dedicated account manager',
-              'Monthly revenue reports',
             ]}
             priceId={basePrice?.id}
             isPopular={true}
