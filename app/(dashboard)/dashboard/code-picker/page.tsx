@@ -3,24 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Flag } from "lucide-react";
-
-// Placeholder data – replicate insurance_data.py content
-const INSURANCE_PLANS: Record<string, boolean> = {
-  Medicare: false,
-  Medicaid: false,
-  "United Health Care": false,
-  "Aetna Medicare": false,
-  UMWA: false,
-  DMBA: false,
-  Aetna: false,
-  BCBS: false,
-  PEHP: true,
-  SelectHealth: true,
-  Other: false,
-  'Humana Choice': false,
-  'Humana Medicare': false,
-  'VA': false,
-};
+import { INSURANCE_PLANS } from "@/lib/insurance-data";
 
 const DOCTORS: Record<string, string> = {
   "Dr. Jensen": "OD",
