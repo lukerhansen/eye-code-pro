@@ -35,7 +35,7 @@ export default function CodePickerPage() {
 
   const [insurancePlan, setInsurancePlan] = useState<string>(insuranceOptions[0]);
   const [doctor, setDoctor] = useState<string>(doctorOptions[0]);
-  const [freeExamBilled, setFreeExamBilled] = useState<boolean>(false);
+  const [freeExamBilled, setFreeExamBilled] = useState<boolean>(true);
   const [isEmergencyVisit, setIsEmergencyVisit] = useState<boolean>(false);
   const [patientType, setPatientType] = useState<"new" | "established">("new");
   const [level, setLevel] = useState<number>(4);
@@ -124,19 +124,6 @@ export default function CodePickerPage() {
       </div>
 
       {/* Conditional checkboxes */}
-      {showEmergencyCheckbox && (
-        <div>
-          <label className="inline-flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={isEmergencyVisit}
-              onChange={(e) => setIsEmergencyVisit(e.target.checked)}
-            />
-            This is an emergency visit
-          </label>
-        </div>
-      )}
-
       {showFreeExamCheckbox && (
         <div>
           <label className="inline-flex items-center gap-2">
@@ -146,6 +133,19 @@ export default function CodePickerPage() {
               onChange={(e) => setFreeExamBilled(e.target.checked)}
             />
             A free exam has already been billed in the last 12 months
+          </label>
+        </div>
+      )}
+
+      {showEmergencyCheckbox && (
+        <div>
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={isEmergencyVisit}
+              onChange={(e) => setIsEmergencyVisit(e.target.checked)}
+            />
+            This is an emergency visit
           </label>
         </div>
       )}
