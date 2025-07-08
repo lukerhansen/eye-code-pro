@@ -32,6 +32,7 @@ export default function CodePickerPage() {
   const [output, setOutput] = useState<string>("");
   const [billingEntryId, setBillingEntryId] = useState<number | null>(null);
   const [isFlagged, setIsFlagged] = useState<boolean>(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   // Derived visibility states
   const coversFreeExam = INSURANCE_PLANS[insurancePlan];
@@ -66,10 +67,11 @@ export default function CodePickerPage() {
       if (!res.ok) {
         throw new Error(data.error || "Unknown error");
       }
-      const { recommendedCode, billingEntryId } = data;
+      const { recommendedCode, billingEntryId, debugInfo } = data;
 
       setBillingEntryId(billingEntryId ?? null);
       setIsFlagged(false);
+      setDebugInfo(debugInfo);
 
       if (!recommendedCode) {
         setOutput("No CPT code available");
@@ -218,6 +220,36 @@ export default function CodePickerPage() {
       {output && (
         <div className="mt-4 text-4xl md:text-6xl font-extrabold text-teal-600 text-center">
           {output}
+        </div>
+      )}
+
+      {/* Debug Information */}
+      {debugInfo?.codeComparison && (
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg border">
+          <h3 className="text-lg font-semibold mb-2">Code Comparison (Debug Info)</h3>
+          <div className="space-y-2 text-sm">
+            <div className="font-medium">Insurance Plan: {debugInfo.codeComparison.insurancePlan}</div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="border-r pr-4">
+                <div className="font-medium">Eye Code (92xxx)</div>
+                <div>Code: {debugInfo.codeComparison.code1 || 'N/A'}</div>
+                <div>Price: ${debugInfo.codeComparison.code1Price.toFixed(2)}</div>
+              </div>
+              <div className="pl-4">
+                <div className="font-medium">E&M Code (99xxx)</div>
+                <div>Code: {debugInfo.codeComparison.code2 || 'N/A'}</div>
+                <div>Price: ${debugInfo.codeComparison.code2Price.toFixed(2)}</div>
+              </div>
+            </div>
+            <div className="mt-3 pt-2 border-t">
+              <div className="font-medium text-teal-600">
+                Winner: {debugInfo.codeComparison.code1Price >= debugInfo.codeComparison.code2Price ? 
+                  `${debugInfo.codeComparison.code1} ($${debugInfo.codeComparison.code1Price.toFixed(2)})` : 
+                  `${debugInfo.codeComparison.code2} ($${debugInfo.codeComparison.code2Price.toFixed(2)})`
+                }
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

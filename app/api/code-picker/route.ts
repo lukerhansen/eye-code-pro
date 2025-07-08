@@ -7,6 +7,7 @@ import {
   getReimbursement,
   getCodePair,
   higherPayingCode,
+  higherPayingCodeWithDebug,
 } from '@/lib/insurance-data';
 
 export async function POST(req: NextRequest) {
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
 
     let rationale = '';
     let recommendedCode: string | null = null;
+    let debugInfo: any = null;
 
     if (isOD && isMedicaid) {
       // OD on Medicaid always uses eye code (92)
@@ -51,13 +53,19 @@ export async function POST(req: NextRequest) {
       }
     } else {
       const [eyeCode, emCode] = getCodePair(patientType, level);
-      recommendedCode = higherPayingCode(eyeCode, emCode, insurancePlan);
+      const result = higherPayingCodeWithDebug(eyeCode, emCode, insurancePlan);
+      recommendedCode = result.winningCode;
       const amount = getReimbursement(insurancePlan, recommendedCode!);
       rationale = `Standard billing - highest-paying code for ${insurancePlan} ($${amount.toFixed(2)})`;
       const hasFreeExam = coversFullExam(insurancePlan) && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
       }
+      
+      // Add debugging information
+      debugInfo = result.comparison ? {
+        codeComparison: result.comparison
+      } : null;
     }
 
     // Save the billing entry for the current user
@@ -78,7 +86,7 @@ export async function POST(req: NextRequest) {
       console.error('Failed to log billing entry', error);
     }
 
-    return NextResponse.json({ rationale, recommendedCode, billingEntryId });
+    return NextResponse.json({ rationale, recommendedCode, billingEntryId, debugInfo });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

@@ -120,4 +120,61 @@ export function higherPayingCode(code1: string | null, code2: string | null, ins
   if (!code1) return code2;
   if (!code2) return code1;
   return getReimbursement(insurancePlan, code1) >= getReimbursement(insurancePlan, code2) ? code1 : code2;
+}
+
+// New function for testing - returns detailed comparison information
+export function higherPayingCodeWithDebug(code1: string | null, code2: string | null, insurancePlan: string): {
+  winningCode: string | null;
+  comparison: {
+    code1: string | null;
+    code1Price: number;
+    code2: string | null;
+    code2Price: number;
+    insurancePlan: string;
+  } | null;
+} {
+  if (!code1 && !code2) {
+    return { winningCode: null, comparison: null };
+  }
+  
+  if (!code1) {
+    return { 
+      winningCode: code2, 
+      comparison: {
+        code1: null,
+        code1Price: 0,
+        code2: code2,
+        code2Price: getReimbursement(insurancePlan, code2),
+        insurancePlan
+      }
+    };
+  }
+  
+  if (!code2) {
+    return { 
+      winningCode: code1, 
+      comparison: {
+        code1: code1,
+        code1Price: getReimbursement(insurancePlan, code1),
+        code2: null,
+        code2Price: 0,
+        insurancePlan
+      }
+    };
+  }
+  
+  const code1Price = getReimbursement(insurancePlan, code1);
+  const code2Price = getReimbursement(insurancePlan, code2);
+  const winningCode = code1Price >= code2Price ? code1 : code2;
+  
+  return {
+    winningCode,
+    comparison: {
+      code1,
+      code1Price,
+      code2,
+      code2Price,
+      insurancePlan
+    }
+  };
 } 
