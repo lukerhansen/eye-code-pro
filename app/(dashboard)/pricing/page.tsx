@@ -74,10 +74,10 @@ function PricingCard({
   isPopular?: boolean;
 }) {
   return (
-    <div className={`relative pt-6 ${isPopular ? 'border-2 border-teal-200 rounded-lg' : ''}`}>
+    <div className={`relative pt-6 ${isPopular ? 'border-2 border-[#198bc4] rounded-lg' : ''}`}>
       {isPopular && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <span className="bg-teal-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+          <span className="bg-[#198bc4] text-white px-4 py-1 rounded-full text-sm font-medium">
             Perfect Choice
           </span>
         </div>
@@ -96,7 +96,7 @@ function PricingCard({
         <ul className="space-y-4 mb-8">
           {features.map((feature, index) => (
             <li key={index} className="flex items-start">
-              <Check className="h-5 w-5 text-teal-600 mr-3 mt-0.5 flex-shrink-0" />
+              <Check className="h-5 w-5 text-[#198bc4] mr-3 mt-0.5 flex-shrink-0" />
               <span className="text-gray-700">{feature}</span>
             </li>
           ))}

@@ -13,8 +13,8 @@ export function SubmitButton({ isPopular = false }: { isPopular?: boolean }) {
       disabled={pending}
       className={`w-full rounded-full ${
         isPopular
-          ? 'bg-teal-600 hover:bg-teal-700 text-white'
-          : 'border border-teal-600 text-teal-600 hover:bg-teal-50'
+          ? 'bg-[#198bc4] hover:bg-[#0f7ba8] text-white'
+          : 'border border-[#198bc4] text-[#198bc4] hover:bg-[#0f7ba8] text-white'
       }`}
     >
       {pending ? (
