@@ -15,8 +15,11 @@ const INSURANCE_PLANS: Record<string, boolean> = {
   Aetna: false,
   BCBS: false,
   PEHP: true,
-  Other: false,
   SelectHealth: true,
+  Other: false,
+  'Humana Choice': false,
+  'Humana Medicare': false,
+  'VA': false,
 };
 
 const DOCTORS: Record<string, string> = {

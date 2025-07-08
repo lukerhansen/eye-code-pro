@@ -56,6 +56,8 @@ const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99212': 40.72,
     '99213': 55.77,
     '99214': 87.55,
+    '99215': 127.67,
+    '99205': 184.46,
   },
   'Humana Medicare': {
     '92002': 77.66,
@@ -86,8 +88,8 @@ const INSURANCE_PLANS: Record<string, boolean> = {
   Aetna: false,
   BCBS: false,
   PEHP: true,
-  Other: false,
   SelectHealth: true,
+  Other: false,
 };
 
 const DOCTORS: Record<string, string> = {
