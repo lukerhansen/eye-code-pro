@@ -5,8 +5,8 @@ import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
-  title: 'EyeCode Pro - Ophthalmology Insurance Code Platform',
-  description: 'Streamline your ophthalmology practice with AI-powered insurance code selection. Reduce claim denials, maximize reimbursements, and save hours of administrative work.',
+  title: 'CodeSelect - Eye Care Insurance Code Platform',
+  description: 'Streamline your ophthalmology or optometry practice with AI-powered insurance code selection. Reduce claim denials, maximize reimbursements, and save hours of administrative work.',
 };
 
 export const viewport: Viewport = {

@@ -1,12 +1,12 @@
-# EyeCode Pro - Ophthalmology Insurance Code Platform
+# CodeSelect - Eye Care Insurance Code Platform
 
-**EyeCode Pro** is a sophisticated platform designed specifically for ophthalmologists to streamline insurance code selection, reduce claim denials, and maximize practice revenue through AI-powered coding assistance.
+**CodeSelect** is a sophisticated platform designed specifically for ophthalmologists and optometrists to streamline insurance code selection, reduce claim denials, and maximize practice revenue through AI-powered coding assistance.
 
-**Demo: [https://eyecode-pro.vercel.app/](https://eyecode-pro.vercel.app/)**
+**Demo: [https://codeselect.vercel.app/](https://codeselect.vercel.app/)**
 
 ## Features
 
-- **Intelligent Code Selection**: AI-powered recommendations for ophthalmology procedures
+- **Intelligent Code Selection**: AI-powered recommendations for eye care procedures
 - **Real-time Claim Validation**: Verify codes against current insurance requirements
 - **Revenue Optimization**: Maximize reimbursements with proper code selection
 - **Compliance Tracking**: Stay current with coding regulations and requirements
@@ -26,8 +26,8 @@
 ## Getting Started
 
 ```bash
-git clone https://github.com/your-org/eyecode-pro
-cd eyecode-pro
+git clone https://github.com/your-org/codeselect
+cd codeselect
 pnpm install
 ```
 
@@ -73,10 +73,10 @@ You can listen for Stripe webhooks locally through their CLI to handle subscript
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-## Features for Ophthalmologists
+## Features for Eye Care Professionals
 
 ### Code Database
-- Complete library of ophthalmology procedure codes
+- Complete library of ophthalmology and optometry procedure codes
 - Regular updates for new and modified codes
 - Cross-referenced with common diagnoses
 
@@ -97,7 +97,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## Support
 
-For support with EyeCode Pro, please contact our team at support@eyecode-pro.com or visit our help center.
+For support with CodeSelect, please contact our team at support@codeselect.com or visit our help center.
 
 ## License
 

@@ -33,7 +33,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           {mode === 'signin'
-            ? 'Access your ophthalmology coding platform'
+            ? 'Access your eye care coding platform'
             : 'Start optimizing your insurance codes today'}
         </p>
       </div>

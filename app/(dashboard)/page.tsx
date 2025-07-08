@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Eye, Shield, DollarSign } from 'lucide-react';
-import { Terminal } from './terminal';
 
 export default function HomePage() {
   return (
@@ -10,11 +9,11 @@ export default function HomePage() {
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Master Ophthalmology
+                Master Eye Care
                 <span className="block text-teal-600">Insurance Codes</span>
               </h1>
               <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                Streamline your practice with AI-powered insurance code selection. 
+                Streamline your ophthalmology or optometry practice with AI-powered insurance code selection. 
                 Reduce claim denials, maximize reimbursements, and save hours of 
                 administrative work with our sophisticated coding platform.
               </p>
@@ -33,7 +32,13 @@ export default function HomePage() {
               </div>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <Terminal />
+              <div className="w-full rounded-lg shadow-lg overflow-hidden flex items-center justify-center">
+                <img 
+                  src="/dashboard-preview.png?v=1" 
+                  alt="Dashboard Preview" 
+                  className="w-3/4 h-auto"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -48,11 +53,11 @@ export default function HomePage() {
               </div>
               <div className="mt-5">
                 <h2 className="text-lg font-medium text-gray-900">
-                  Ophthalmology Expertise
+                  Eye Care Expertise
                 </h2>
                 <p className="mt-2 text-base text-gray-500">
                   Specialized knowledge of eye care procedures and their corresponding 
-                  insurance codes. Built by experts who understand your practice needs.
+                  insurance codes. Built by experts who understand ophthalmology and optometry practice needs.
                 </p>
               </div>
             </div>
@@ -98,7 +103,7 @@ export default function HomePage() {
                 Ready to optimize your practice?
               </h2>
               <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                Join thousands of ophthalmologists who trust our platform to 
+                Join eye care professionals who trust CodeSelect to 
                 streamline their coding process and maximize their revenue potential.
               </p>
             </div>

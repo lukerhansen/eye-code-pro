@@ -7,7 +7,7 @@ export function Terminal() {
   const [terminalStep, setTerminalStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const terminalSteps = [
-    '$ ophthalmology-codes --search "cataract surgery"',
+    '$ codeselect --search "cataract surgery"',
     '$ validate-claim --procedure 66984 --diagnosis H25.9',
     '$ check-reimbursement --code 66984 --payer anthem',
     '$ generate-report --month january --practice-id 12345',
