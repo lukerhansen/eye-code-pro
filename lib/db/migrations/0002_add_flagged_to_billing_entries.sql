@@ -1,0 +1,2 @@
+ALTER TABLE billing_entries
+ADD COLUMN flagged BOOLEAN NOT NULL DEFAULT FALSE; 

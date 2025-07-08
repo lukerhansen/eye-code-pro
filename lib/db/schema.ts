@@ -69,6 +69,7 @@ export const billingEntries = pgTable('billing_entries', {
   diagnosis: varchar('diagnosis', { length: 255 }),
   isEmergencyVisit: boolean('is_emergency_visit').notNull().default(false),
   freeExamBilledLastYear: boolean('free_exam_billed_last_year').notNull().default(false),
+  flagged: boolean('flagged').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

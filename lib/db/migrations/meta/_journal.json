@@ -15,6 +15,13 @@
       "when": 1752002473817,
       "tag": "0001_wonderful_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752003014364,
+      "tag": "0002_jittery_centennial",
+      "breakpoints": true
     }
   ]
 }

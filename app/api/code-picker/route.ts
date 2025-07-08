@@ -147,8 +147,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Save the billing entry for the current user
+    let billingEntryId: number | undefined;
     try {
-      await logBillingEntry({
+      billingEntryId = await logBillingEntry({
         insurancePlan,
         doctor,
         patientType,
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
       console.error('Failed to log billing entry', error);
     }
 
-    return NextResponse.json({ rationale, recommendedCode });
+    return NextResponse.json({ rationale, recommendedCode, billingEntryId });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

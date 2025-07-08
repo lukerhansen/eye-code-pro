@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Flag } from "lucide-react";
 
 // Placeholder data – replicate insurance_data.py content
 const INSURANCE_PLANS: Record<string, boolean> = {
@@ -43,6 +44,8 @@ export default function CodePickerPage() {
   const [level, setLevel] = useState<number>(4);
   const [diagnosis, setDiagnosis] = useState<string>(DIAGNOSES[0]);
   const [output, setOutput] = useState<string>("");
+  const [billingEntryId, setBillingEntryId] = useState<number | null>(null);
+  const [isFlagged, setIsFlagged] = useState<boolean>(false);
 
   // Derived visibility states
   const coversFreeExam = INSURANCE_PLANS[insurancePlan];
@@ -77,7 +80,10 @@ export default function CodePickerPage() {
       if (!res.ok) {
         throw new Error(data.error || "Unknown error");
       }
-      const { recommendedCode } = data;
+      const { recommendedCode, billingEntryId } = data;
+
+      setBillingEntryId(billingEntryId ?? null);
+      setIsFlagged(false);
 
       if (!recommendedCode) {
         setOutput("No CPT code available");
@@ -89,6 +95,21 @@ export default function CodePickerPage() {
       setOutput(codeDisplay);
     } catch (err: any) {
       setOutput(`Error: ${err.message}`);
+    }
+  };
+
+  const handleFlag = async () => {
+    if (!billingEntryId) return;
+
+    try {
+      await fetch("/api/billing-entries/flag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entryId: billingEntryId }),
+      });
+      setIsFlagged(true);
+    } catch (err) {
+      console.error("Failed to flag entry", err);
     }
   };
 
@@ -212,6 +233,17 @@ export default function CodePickerPage() {
         <div className="mt-4 text-4xl md:text-6xl font-extrabold text-teal-600 text-center">
           {output}
         </div>
+      )}
+
+      {/* Flag button */}
+      {billingEntryId && !isFlagged && (
+        <Button
+          variant="outline"
+          className="mt-4 flex items-center gap-2 border-red-500 text-red-600"
+          onClick={handleFlag}
+        >
+          <Flag className="h-5 w-5" /> Flag as incorrect
+        </Button>
       )}
     </div>
   );

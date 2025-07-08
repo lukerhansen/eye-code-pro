@@ -108,7 +108,11 @@ export async function getActivityLogs() {
 
 // ---------------- Billing Entries ----------------
 
-export async function logBillingEntry(entry: Omit<NewBillingEntry, 'id' | 'userId' | 'createdAt'>) {
+export async function logBillingEntry(
+  entry: Omit<NewBillingEntry, 'id' | 'userId' | 'createdAt' | 'flagged'> & {
+    flagged?: boolean;
+  }
+) {
   const user = await getUser();
   if (!user) {
     throw new Error('User not authenticated');
@@ -117,9 +121,15 @@ export async function logBillingEntry(entry: Omit<NewBillingEntry, 'id' | 'userI
   const newEntry: NewBillingEntry = {
     ...entry,
     userId: user.id,
+    flagged: entry.flagged ?? false,
   } as NewBillingEntry;
 
-  await db.insert(billingEntries).values(newEntry);
+  const [inserted] = await db
+    .insert(billingEntries)
+    .values(newEntry)
+    .returning({ id: billingEntries.id });
+
+  return inserted?.id;
 }
 
 export async function getBillingEntries(limit = 20) {
@@ -132,8 +142,21 @@ export async function getBillingEntries(limit = 20) {
     .select()
     .from(billingEntries)
     .where(eq(billingEntries.userId, user.id))
-    .orderBy(desc(billingEntries.createdAt))
+    .orderBy(desc(billingEntries.flagged), desc(billingEntries.createdAt))
     .limit(limit);
+}
+
+// Flag (or unflag) a billing entry belonging to the current user
+export async function flagBillingEntry(entryId: number, flagged = true) {
+  const user = await getUser();
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  await db
+    .update(billingEntries)
+    .set({ flagged })
+    .where(and(eq(billingEntries.id, entryId), eq(billingEntries.userId, user.id)));
 }
 
 export async function getTeamForUser() {

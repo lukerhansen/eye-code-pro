@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, AlertCircle } from 'lucide-react';
+import { DollarSign, AlertCircle, Flag } from 'lucide-react';
 import { getBillingEntries } from '@/lib/db/queries';
 
 function getRelativeTime(date: Date) {
@@ -33,8 +33,14 @@ export default async function ActivityPage() {
             <ul className="space-y-4">
               {entries.map((entry) => (
                 <li key={entry.id} className="flex items-center space-x-4">
-                  <div className="bg-teal-100 rounded-full p-2">
-                    <DollarSign className="w-5 h-5 text-teal-600" />
+                  <div
+                    className={`rounded-full p-2 ${entry.flagged ? 'bg-red-100' : 'bg-teal-100'}`}
+                  >
+                    {entry.flagged ? (
+                      <Flag className="w-5 h-5 text-red-600" />
+                    ) : (
+                      <DollarSign className="w-5 h-5 text-teal-600" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
@@ -42,6 +48,7 @@ export default async function ActivityPage() {
                         entry.patientType
                       }{' '}
                       {entry.level})
+                      {entry.flagged && ' • Flagged'}
                     </p>
                     <p className="text-xs text-gray-500">
                       {getRelativeTime(new Date(entry.createdAt))}
