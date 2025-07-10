@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu, FileText, ChevronDown, ChevronRight } from 'lucide-react';
+import { Users, Settings, Shield, Activity, Menu, FileText, ChevronDown, ChevronRight, UserCog } from 'lucide-react';
 
 export default function DashboardLayout({
   children
@@ -17,6 +17,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: '/dashboard/code-picker', icon: FileText, label: 'Code Picker' },
+    { href: '/dashboard/doctors', icon: UserCog, label: 'Doctors' },
     { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
     { 
       href: '/dashboard/general', 
