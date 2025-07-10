@@ -26,7 +26,8 @@ export async function GET(
       return NextResponse.json({ error: 'No team found' }, { status: 404 });
     }
 
-    const doctorId = parseInt(params.id);
+    const resolvedParams = await params;
+    const doctorId = parseInt(resolvedParams.id);
 
     // Verify doctor belongs to team
     const [doctor] = await db
@@ -101,7 +102,8 @@ export async function POST(
       return NextResponse.json({ error: 'No team found' }, { status: 404 });
     }
 
-    const doctorId = parseInt(params.id);
+    const resolvedParams = await params;
+    const doctorId = parseInt(resolvedParams.id);
     const body = await req.json();
     const { insurancePlanId, isAccepted, useCustomFeeSchedule, customFees } = body;
 

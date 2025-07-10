@@ -53,7 +53,7 @@ export default function DoctorInsurancesPage() {
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [insuranceAcceptances, setInsuranceAcceptances] = useState<InsuranceAcceptance[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingStates, setSavingStates] = useState<Record<number, boolean>>({});
   const [editingInsurance, setEditingInsurance] = useState<InsuranceAcceptance | null>(null);
   const [feeScheduleDialogOpen, setFeeScheduleDialogOpen] = useState(false);
   const [defaultFees, setDefaultFees] = useState<FeeSchedule[]>([]);
@@ -75,7 +75,25 @@ export default function DoctorInsurancesPage() {
       const insuranceResponse = await fetch(`/api/doctors/${doctorId}/insurances`);
       const insuranceData = await insuranceResponse.json();
       if (insuranceResponse.ok) {
-        setInsuranceAcceptances(insuranceData.insuranceAcceptances);
+        // Sort to prioritize Medicare and Medicaid when accepted
+        const sortedAcceptances = insuranceData.insuranceAcceptances.sort((a: InsuranceAcceptance, b: InsuranceAcceptance) => {
+          // First, prioritize accepted Medicare and Medicaid
+          const aIsPriority = a.isAccepted && (a.insurancePlan.name === 'Medicare' || a.insurancePlan.name === 'Medicaid');
+          const bIsPriority = b.isAccepted && (b.insurancePlan.name === 'Medicare' || b.insurancePlan.name === 'Medicaid');
+          
+          if (aIsPriority && !bIsPriority) return -1;
+          if (!aIsPriority && bIsPriority) return 1;
+          
+          // Then sort by accepted status
+          if (a.isAccepted !== b.isAccepted) {
+            return b.isAccepted ? 1 : -1;
+          }
+          
+          // Finally, sort alphabetically
+          return a.insurancePlan.name.localeCompare(b.insurancePlan.name);
+        });
+        
+        setInsuranceAcceptances(sortedAcceptances);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -85,29 +103,48 @@ export default function DoctorInsurancesPage() {
   };
 
   const handleAcceptanceChange = async (acceptance: InsuranceAcceptance, isAccepted: boolean) => {
-    setSaving(true);
+    const planId = acceptance.insurancePlan.id;
+    
+    // Optimistic update - immediately update the UI
+    setInsuranceAcceptances(insuranceAcceptances.map(ia => 
+      ia.insurancePlan.id === planId
+        ? { ...ia, isAccepted }
+        : ia
+    ));
+    
+    // Set loading state for this specific insurance plan
+    setSavingStates(prev => ({ ...prev, [planId]: true }));
+    
     try {
       const response = await fetch(`/api/doctors/${doctorId}/insurances`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          insurancePlanId: acceptance.insurancePlan.id,
+          insurancePlanId: planId,
           isAccepted,
           useCustomFeeSchedule: false,
         }),
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        // Revert the optimistic update if the API call failed
         setInsuranceAcceptances(insuranceAcceptances.map(ia => 
-          ia.insurancePlan.id === acceptance.insurancePlan.id
-            ? { ...ia, isAccepted }
+          ia.insurancePlan.id === planId
+            ? { ...ia, isAccepted: !isAccepted }
             : ia
         ));
+        console.error('Error updating acceptance: API call failed');
       }
     } catch (error) {
+      // Revert the optimistic update if the API call failed
+      setInsuranceAcceptances(insuranceAcceptances.map(ia => 
+        ia.insurancePlan.id === planId
+          ? { ...ia, isAccepted: !isAccepted }
+          : ia
+      ));
       console.error('Error updating acceptance:', error);
     } finally {
-      setSaving(false);
+      setSavingStates(prev => ({ ...prev, [planId]: false }));
     }
   };
 
@@ -144,7 +181,9 @@ export default function DoctorInsurancesPage() {
   const saveFeeSchedule = async (useCustom: boolean) => {
     if (!editingInsurance) return;
     
-    setSaving(true);
+    const planId = editingInsurance.insurancePlan.id;
+    setSavingStates(prev => ({ ...prev, [planId]: true }));
+    
     try {
       const customFeeData = useCustom 
         ? Object.entries(customFees).map(([code, amount]) => ({
@@ -157,7 +196,7 @@ export default function DoctorInsurancesPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          insurancePlanId: editingInsurance.insurancePlan.id,
+          insurancePlanId: planId,
           isAccepted: true,
           useCustomFeeSchedule: useCustom,
           customFees: customFeeData,
@@ -171,7 +210,7 @@ export default function DoctorInsurancesPage() {
     } catch (error) {
       console.error('Error saving fee schedule:', error);
     } finally {
-      setSaving(false);
+      setSavingStates(prev => ({ ...prev, [planId]: false }));
     }
   };
 
@@ -230,7 +269,7 @@ export default function DoctorInsurancesPage() {
                       onCheckedChange={(checked) => 
                         handleAcceptanceChange(acceptance, checked as boolean)
                       }
-                      disabled={saving}
+                      disabled={savingStates[acceptance.insurancePlan.id] || false}
                     />
                   </TableCell>
                   <TableCell className="font-medium">
@@ -311,13 +350,13 @@ export default function DoctorInsurancesPage() {
             <Button
               variant="outline"
               onClick={() => saveFeeSchedule(false)}
-              disabled={saving}
+              disabled={savingStates[editingInsurance?.insurancePlan.id || 0] || false}
             >
               Use Default Rates
             </Button>
             <Button
               onClick={() => saveFeeSchedule(true)}
-              disabled={saving}
+              disabled={savingStates[editingInsurance?.insurancePlan.id || 0] || false}
             >
               <Save className="mr-2 h-4 w-4" />
               Save Custom Rates

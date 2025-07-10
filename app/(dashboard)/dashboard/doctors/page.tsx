@@ -6,6 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -163,12 +170,16 @@ export default function DoctorsPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="degree">Degree</Label>
-                    <Input
-                      id="degree"
-                      value={formData.degree}
-                      onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                      placeholder="OD, MD, DO"
-                    />
+                    <Select value={formData.degree} onValueChange={(value) => setFormData({ ...formData, degree: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select degree" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="OD">OD</SelectItem>
+                        <SelectItem value="MD">MD</SelectItem>
+                        <SelectItem value="DO">DO</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <DialogFooter>
@@ -260,12 +271,16 @@ export default function DoctorsPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-degree">Degree</Label>
-              <Input
-                id="edit-degree"
-                value={formData.degree}
-                onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                placeholder="OD, MD, DO"
-              />
+              <Select value={formData.degree} onValueChange={(value) => setFormData({ ...formData, degree: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select degree" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="OD">OD</SelectItem>
+                  <SelectItem value="MD">MD</SelectItem>
+                  <SelectItem value="DO">DO</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>

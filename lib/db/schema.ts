@@ -91,6 +91,7 @@ export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
   invitations: many(invitations),
+  doctors: many(doctors),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -155,6 +156,119 @@ export type TeamDataWithMembers = Team & {
     user: Pick<User, 'id' | 'name' | 'email'>;
   })[];
 };
+
+// Doctors table
+export const doctors = pgTable('doctors', {
+  id: serial('id').primaryKey(),
+  teamId: integer('team_id')
+    .notNull()
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  degree: varchar('degree', { length: 20 }).notNull(), // OD, MD, DO, etc.
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Insurance plans master list
+export const insurancePlans = pgTable('insurance_plans', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+  coversFreeExam: boolean('covers_free_exam').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// Doctor insurance acceptance
+export const doctorInsurances = pgTable('doctor_insurances', {
+  id: serial('id').primaryKey(),
+  doctorId: integer('doctor_id')
+    .notNull()
+    .references(() => doctors.id, { onDelete: 'cascade' }),
+  insurancePlanId: integer('insurance_plan_id')
+    .notNull()
+    .references(() => insurancePlans.id),
+  isAccepted: boolean('is_accepted').notNull().default(true),
+  useCustomFeeSchedule: boolean('use_custom_fee_schedule').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Default fee schedules by insurance and region
+export const defaultFeeSchedules = pgTable('default_fee_schedules', {
+  id: serial('id').primaryKey(),
+  insurancePlanId: integer('insurance_plan_id')
+    .notNull()
+    .references(() => insurancePlans.id),
+  region: varchar('region', { length: 100 }).notNull(), // e.g., 'midwest', 'west', 'northeast'
+  code: varchar('code', { length: 20 }).notNull(), // CPT code
+  amount: integer('amount').notNull(), // Amount in cents
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Custom fee schedules for specific doctor-insurance combinations
+export const customFeeSchedules = pgTable('custom_fee_schedules', {
+  id: serial('id').primaryKey(),
+  doctorInsuranceId: integer('doctor_insurance_id')
+    .notNull()
+    .references(() => doctorInsurances.id, { onDelete: 'cascade' }),
+  code: varchar('code', { length: 20 }).notNull(), // CPT code
+  amount: integer('amount').notNull(), // Amount in cents
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// Relations for the new tables
+export const doctorsRelations = relations(doctors, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [doctors.teamId],
+    references: [teams.id],
+  }),
+  doctorInsurances: many(doctorInsurances),
+}));
+
+export const insurancePlansRelations = relations(insurancePlans, ({ many }) => ({
+  doctorInsurances: many(doctorInsurances),
+  defaultFeeSchedules: many(defaultFeeSchedules),
+}));
+
+export const doctorInsurancesRelations = relations(doctorInsurances, ({ one, many }) => ({
+  doctor: one(doctors, {
+    fields: [doctorInsurances.doctorId],
+    references: [doctors.id],
+  }),
+  insurancePlan: one(insurancePlans, {
+    fields: [doctorInsurances.insurancePlanId],
+    references: [insurancePlans.id],
+  }),
+  customFeeSchedules: many(customFeeSchedules),
+}));
+
+export const defaultFeeSchedulesRelations = relations(defaultFeeSchedules, ({ one }) => ({
+  insurancePlan: one(insurancePlans, {
+    fields: [defaultFeeSchedules.insurancePlanId],
+    references: [insurancePlans.id],
+  }),
+}));
+
+export const customFeeSchedulesRelations = relations(customFeeSchedules, ({ one }) => ({
+  doctorInsurance: one(doctorInsurances, {
+    fields: [customFeeSchedules.doctorInsuranceId],
+    references: [doctorInsurances.id],
+  }),
+}));
+
+
+// Export types
+export type Doctor = typeof doctors.$inferSelect;
+export type NewDoctor = typeof doctors.$inferInsert;
+export type InsurancePlan = typeof insurancePlans.$inferSelect;
+export type NewInsurancePlan = typeof insurancePlans.$inferInsert;
+export type DoctorInsurance = typeof doctorInsurances.$inferSelect;
+export type NewDoctorInsurance = typeof doctorInsurances.$inferInsert;
+export type DefaultFeeSchedule = typeof defaultFeeSchedules.$inferSelect;
+export type NewDefaultFeeSchedule = typeof defaultFeeSchedules.$inferInsert;
+export type CustomFeeSchedule = typeof customFeeSchedules.$inferSelect;
+export type NewCustomFeeSchedule = typeof customFeeSchedules.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = 'SIGN_UP',
