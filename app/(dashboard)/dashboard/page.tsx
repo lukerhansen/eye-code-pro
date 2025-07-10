@@ -12,13 +12,14 @@ import {
 import { customerPortalAction } from '@/lib/payments/actions';
 import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
+import { removeTeamMember, inviteTeamMember, updateTeamState } from '@/app/(login)/actions';
 import useSWR from 'swr';
 import { Suspense } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Loader2, PlusCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, PlusCircle, MapPin } from 'lucide-react';
 
 type ActionState = {
   error?: string;
@@ -66,6 +67,146 @@ function ManageSubscription() {
               </Button>
             </form>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PracticeInformationSkeleton() {
+  return (
+    <Card className="mb-8 h-[160px]">
+      <CardHeader>
+        <CardTitle>Practice Information</CardTitle>
+      </CardHeader>
+    </Card>
+  );
+}
+
+const US_STATES = [
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' }
+];
+
+function PracticeInformation() {
+  const { data: teamData, mutate } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const isOwner = user?.role === 'owner';
+  const [updateState, updateAction, isUpdatePending] = useActionState<
+    ActionState,
+    FormData
+  >(updateTeamState, {});
+
+  const handleStateChange = (newState: string) => {
+    const formData = new FormData();
+    formData.set('state', newState);
+    updateAction(formData);
+    // Optimistically update the UI
+    mutate();
+  };
+
+  const currentState = teamData?.state;
+  const currentStateLabel = US_STATES.find(state => state.value === currentState)?.label;
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
+          Practice Information
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <div className="mb-4 sm:mb-0">
+              <Label htmlFor="state" className="text-sm font-medium">
+                Practice State
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Select your practice's state for accurate insurance reimbursement rates
+              </p>
+            </div>
+            <div className="w-full sm:w-48">
+              <Select
+                value={currentState || ''}
+                onValueChange={handleStateChange}
+                disabled={!isOwner || isUpdatePending}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select state">
+                    {currentStateLabel || 'No state selected'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map((state) => (
+                    <SelectItem key={state.value} value={state.value}>
+                      {state.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {updateState?.error && (
+            <p className="text-red-500 text-sm">{updateState.error}</p>
+          )}
+          {updateState?.success && (
+            <p className="text-green-500 text-sm">{updateState.success}</p>
+          )}
+          {!isOwner && (
+            <p className="text-sm text-muted-foreground">
+              Only practice owners can update practice settings.
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -255,6 +396,9 @@ export default function SettingsPage() {
       <h1 className="text-lg lg:text-2xl font-medium mb-6">Practice Management</h1>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
+      </Suspense>
+      <Suspense fallback={<PracticeInformationSkeleton />}>
+        <PracticeInformation />
       </Suspense>
       <Suspense fallback={<TeamMembersSkeleton />}>
         <TeamMembers />
