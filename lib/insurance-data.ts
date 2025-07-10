@@ -1,20 +1,6 @@
 // Insurance reimbursement rates by plan and code
 export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
   //defaults to medicare if not specified
-  'Humana Choice': {
-    '92002': 75.21,
-    '92004': 137.27,
-    '92012': 68.81,
-    '92014': 101.88,
-    '99202': 68.99,
-    '99203': 102.58,
-    '99204': 145.40,
-    '99212': 40.72,
-    '99213': 55.77,
-    '99214': 87.55,
-    '99215': 127.67,
-    '99205': 184.46,
-  },
   Medicare: {
     '92002': 77.66,
     '92004': 137.33,
@@ -42,6 +28,20 @@ export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99213': 67.71,
     '99214': 95.44,
     '99215': 134.10,
+  },
+  'Humana Choice': {
+    '92002': 75.21,
+    '92004': 137.27,
+    '92012': 68.81,
+    '92014': 101.88,
+    '99202': 68.99,
+    '99203': 102.58,
+    '99204': 145.40,
+    '99212': 40.72,
+    '99213': 55.77,
+    '99214': 87.55,
+    '99215': 127.67,
+    '99205': 184.46,
   },
 };
 
@@ -79,13 +79,13 @@ export const DIAGNOSIS_ELIGIBILITY: Record<string, boolean> = {
 // Code pairs for different patient types and levels
 export const CODES: Record<string, Record<number, [string | null, string | null]>> = {
   new: {
-    2: ['92002', '99202'],
+    2: ['92002', '99202'],  
     3: ['92004', '99203'],
     4: ['92004', '99204'],
     5: [null, '99205'],
   },
   established: {
-    2: [null, '99212'],
+    2: [null, '99212'],  
     3: ['92012', '99213'],
     4: ['92014', '99214'],
     5: [null, '99215'],

@@ -457,3 +457,37 @@ export const inviteTeamMember = validatedActionWithUser(
     return { success: 'Invitation sent successfully' };
   }
 );
+
+const updateTeamStateSchema = z.object({
+  state: z.string().length(2).nullable().optional()
+});
+
+export const updateTeamState = validatedActionWithUser(
+  updateTeamStateSchema,
+  async (data, _, user) => {
+    const { state } = data;
+    const userWithTeam = await getUserWithTeam(user.id);
+
+    if (!userWithTeam?.teamId) {
+      return { error: 'User is not part of a team' };
+    }
+
+    // Only team owners can update team settings
+    if (user.role !== 'owner') {
+      return { error: 'Only practice owners can update practice settings' };
+    }
+
+    await db
+      .update(teams)
+      .set({ state: state || null })
+      .where(eq(teams.id, userWithTeam.teamId));
+
+    await logActivity(
+      userWithTeam.teamId,
+      user.id,
+      ActivityType.UPDATE_TEAM_SETTINGS
+    );
+
+    return { success: 'Practice state updated successfully' };
+  }
+);
