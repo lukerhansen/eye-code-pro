@@ -79,13 +79,13 @@ export const DIAGNOSIS_ELIGIBILITY: Record<string, boolean> = {
 // Code pairs for different patient types and levels
 export const CODES: Record<string, Record<number, [string | null, string | null]>> = {
   new: {
-    2: ['92002', '99202'],
+    2: ['92002', '99202'],  
     3: ['92004', '99203'],
     4: ['92004', '99204'],
     5: [null, '99205'],
   },
   established: {
-    2: [null, '99212'],
+    2: [null, '99212'],  
     3: ['92012', '99213'],
     4: ['92014', '99214'],
     5: [null, '99215'],

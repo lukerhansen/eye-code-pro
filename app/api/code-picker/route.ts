@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       // OD on Medicaid always uses eye code (92)
       const actualLevel = level === 5 ? 4 : level;
       const [eyeCode] = getCodePair(patientType, actualLevel);
-      recommendedCode = eyeCode;
+      recommendedCode = eyeCode;  //this is problem LUKE
       const amount = getReimbursement('Medicaid', recommendedCode!);
       rationale = `OD on Medicaid - always use eye code (92) ($${amount.toFixed(2)})`;
       if (level === 5) {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         diagnosisCode = "Z01.00"
         //TDOO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
-      
+      //No cpt code for this. in what cases?
       // Add debugging information
       debugInfo = result.comparison ? {
         codeComparison: result.comparison
