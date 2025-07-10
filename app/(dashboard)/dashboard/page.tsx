@@ -14,7 +14,7 @@ import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
 import { removeTeamMember, inviteTeamMember, updateTeamState } from '@/app/(login)/actions';
 import useSWR from 'swr';
-import { Suspense } from 'react';
+import { Suspense, startTransition, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -146,12 +146,19 @@ function PracticeInformation() {
   >(updateTeamState, {});
 
   const handleStateChange = (newState: string) => {
-    const formData = new FormData();
-    formData.set('state', newState);
-    updateAction(formData);
-    // Optimistically update the UI
-    mutate();
+    startTransition(() => {
+      const formData = new FormData();
+      formData.set('state', newState);
+      updateAction(formData);
+    });
   };
+
+  // Revalidate when the action completes (pending goes from true to false)
+  useEffect(() => {
+    if (!isUpdatePending && updateState.success) {
+      mutate();
+    }
+  }, [isUpdatePending, updateState.success, mutate]);
 
   const currentState = teamData?.state;
   const currentStateLabel = US_STATES.find(state => state.value === currentState)?.label;

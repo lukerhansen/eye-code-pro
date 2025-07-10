@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
 import { defaultFeeSchedules, insurancePlans } from '@/lib/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import { getUser } from '@/lib/db/queries';
 
 export async function GET(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const insurancePlanId = searchParams.get('insurancePlanId');
-    const region = searchParams.get('region') || 'midwest'; // Default to midwest
+    const state = searchParams.get('state'); // State code (e.g., 'CA', 'NY')
 
     if (!insurancePlanId) {
       return NextResponse.json(
@@ -36,20 +36,38 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get default fee schedules for this insurance and region
-    const feeSchedules = await db
-      .select()
-      .from(defaultFeeSchedules)
-      .where(
-        and(
-          eq(defaultFeeSchedules.insurancePlanId, parseInt(insurancePlanId)),
-          eq(defaultFeeSchedules.region, region)
-        )
-      );
+    // Get default fee schedules for this insurance and state (with global fallback)
+    let feeSchedules;
+    
+    if (state) {
+      // Try to get state-specific fee schedules first
+      feeSchedules = await db
+        .select()
+        .from(defaultFeeSchedules)
+        .where(
+          and(
+            eq(defaultFeeSchedules.insurancePlanId, parseInt(insurancePlanId)),
+            eq(defaultFeeSchedules.state, state)
+          )
+        );
+    }
+    
+    // If no state-specific schedules found, get global defaults
+    if (!feeSchedules || feeSchedules.length === 0) {
+      feeSchedules = await db
+        .select()
+        .from(defaultFeeSchedules)
+        .where(
+          and(
+            eq(defaultFeeSchedules.insurancePlanId, parseInt(insurancePlanId)),
+            isNull(defaultFeeSchedules.state)
+          )
+        );
+    }
 
     return NextResponse.json({
       insurancePlan,
-      region,
+      state,
       feeSchedules: feeSchedules.map(fs => ({
         code: fs.code,
         amount: fs.amount, // Amount is in cents
@@ -64,7 +82,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Get all available regions
+// Get all available US states
 export async function OPTIONS() {
   try {
     const user = await getUser();
@@ -72,15 +90,20 @@ export async function OPTIONS() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // For now, we'll return a static list of regions
-    // In the future, this could be dynamic from the database
-    const regions = ['midwest', 'west', 'northeast', 'southeast', 'southwest'];
+    // US state abbreviations
+    const states = [
+      'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+      'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+      'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+      'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+      'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+    ];
 
-    return NextResponse.json({ regions });
+    return NextResponse.json({ states });
   } catch (error) {
-    console.error('Error fetching regions:', error);
+    console.error('Error fetching states:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch regions' },
+      { error: 'Failed to fetch states' },
       { status: 500 }
     );
   }

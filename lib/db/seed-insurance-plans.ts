@@ -2,8 +2,7 @@ import { db } from './drizzle';
 import { insurancePlans, defaultFeeSchedules } from './schema';
 import { INSURANCE_PLANS, CODE_REIMBURSEMENT } from '../insurance-data';
 
-// Default region for seed data
-const DEFAULT_REGION = 'midwest';
+// Seed global defaults (state = null) for all insurance plans
 
 async function seedInsurancePlans() {
   console.log('Seeding insurance plans...');
@@ -35,7 +34,7 @@ async function seedInsurancePlans() {
           await db.insert(defaultFeeSchedules)
             .values({
               insurancePlanId: plan.id,
-              region: DEFAULT_REGION,
+              state: null, // Global default
               code,
               amount: Math.round(amount * 100), // Convert to cents
             })
@@ -47,7 +46,7 @@ async function seedInsurancePlans() {
           await db.insert(defaultFeeSchedules)
             .values({
               insurancePlanId: plan.id,
-              region: DEFAULT_REGION,
+              state: null, // Global default
               code,
               amount: Math.round(amount * 100), // Convert to cents
             })

@@ -23,6 +23,7 @@ export const users = pgTable('users', {
 export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
+  state: varchar('state', { length: 2 }), // US state abbreviation (e.g., 'CA', 'NY', 'TX')
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   stripeCustomerId: text('stripe_customer_id').unique(),
@@ -192,13 +193,13 @@ export const doctorInsurances = pgTable('doctor_insurances', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-// Default fee schedules by insurance and region
+// Default fee schedules by insurance and state
 export const defaultFeeSchedules = pgTable('default_fee_schedules', {
   id: serial('id').primaryKey(),
   insurancePlanId: integer('insurance_plan_id')
     .notNull()
     .references(() => insurancePlans.id),
-  region: varchar('region', { length: 100 }).notNull(), // e.g., 'midwest', 'west', 'northeast'
+  state: varchar('state', { length: 2 }), // US state abbreviation (e.g., 'CA', 'NY', 'TX'), null for global defaults
   code: varchar('code', { length: 20 }).notNull(), // CPT code
   amount: integer('amount').notNull(), // Amount in cents
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -281,4 +282,5 @@ export enum ActivityType {
   REMOVE_TEAM_MEMBER = 'REMOVE_TEAM_MEMBER',
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
+  UPDATE_TEAM_SETTINGS = 'UPDATE_TEAM_SETTINGS',
 }
