@@ -109,7 +109,7 @@ export default function CodePickerPage() {
 
   const handleSubmit = async () => {
     if (!selectedDoctor || !selectedInsurance) {
-      setOutput("Please select a doctor and insurance plan");
+      setOutput("Please select an insurance plan.");
       return;
     }
 
