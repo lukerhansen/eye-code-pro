@@ -34,7 +34,7 @@ import type { Doctor } from '@/lib/db/schema';
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [usage, setUsage] = useState({ current: 0, limit: 1 });
+  const [usage, setUsage] = useState({ current: 0, limit: 1, displayed: 0 });
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -157,11 +157,16 @@ export default function DoctorsPage() {
               </CardDescription>
               {usage.limit > 0 ? (
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Using {usage.current} of {usage.limit} doctor{usage.limit !== 1 ? 's' : ''}
+                  Using {Math.min(usage.current, usage.limit)} of {usage.limit} doctor{usage.limit !== 1 ? 's' : ''}
                 </div>
               ) : (
                 <div className="mt-2 text-sm text-muted-foreground">
                   Upgrade to add your first doctor
+                </div>
+              )}
+              {usage.displayed !== undefined && usage.displayed < usage.current && (
+                <div className="mt-2 text-sm text-amber-600">
+                  Showing {usage.displayed} of {usage.current} doctors due to your current plan limit
                 </div>
               )}
             </div>
@@ -264,7 +269,8 @@ export default function DoctorsPage() {
               No doctors added yet. Click "Add Doctor" to get started.
             </div>
           ) : (
-            <Table>
+            <>
+              <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -309,6 +315,7 @@ export default function DoctorsPage() {
                 ))}
               </TableBody>
             </Table>
+            </>
           )}
         </CardContent>
       </Card>

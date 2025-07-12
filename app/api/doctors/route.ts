@@ -16,17 +16,21 @@ export async function GET() {
       return NextResponse.json({ error: 'No team found' }, { status: 404 });
     }
 
-    const doctorsList = await db
+    const allDoctors = await db
       .select()
       .from(doctors)
       .where(eq(doctors.teamId, team.id))
       .orderBy(doctors.name);
 
+    // Truncate the list to the current doctor limit
+    const doctorsList = allDoctors.slice(0, team.doctorLimit);
+
     return NextResponse.json({ 
       doctors: doctorsList,
       usage: {
-        current: doctorsList.length,
-        limit: team.doctorLimit
+        current: allDoctors.length,
+        limit: team.doctorLimit,
+        displayed: doctorsList.length
       }
     });
   } catch (error) {

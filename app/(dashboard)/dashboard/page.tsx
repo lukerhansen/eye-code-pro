@@ -70,7 +70,7 @@ function ManageSubscription() {
               {doctorUsage.limit > 0 ? (
                 <div className="mt-2">
                   <p className="text-sm font-medium">
-                    Doctors: {doctorUsage.current} of {doctorUsage.limit}
+                    Doctors: {Math.min(doctorUsage.current, doctorUsage.limit)} of {doctorUsage.limit}
                   </p>
                   <div className="w-48 bg-gray-200 rounded-full h-2 mt-1">
                     <div 

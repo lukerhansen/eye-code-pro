@@ -36,6 +36,7 @@ export default function CodePickerPage() {
   const [isFlagged, setIsFlagged] = useState<boolean>(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [usage, setUsage] = useState<{ current: number; limit: number; displayed: number } | null>(null);
 
   // Derived visibility states
   const coversFreeExam = selectedInsurance?.coversFreeExam || false;
@@ -67,6 +68,7 @@ export default function CodePickerPage() {
       const data = await response.json();
       if (response.ok) {
         setDoctors(data.doctors);
+        setUsage(data.usage);
         if (data.doctors.length > 0) {
           setSelectedDoctor(data.doctors[0]);
         }
