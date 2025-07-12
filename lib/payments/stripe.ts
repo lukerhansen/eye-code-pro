@@ -122,6 +122,7 @@ export async function createCustomerPortalSession(team: Team) {
 export async function handleSubscriptionChange(
   subscription: Stripe.Subscription
 ) {
+  console.log('hi luke from handle subscrption chagne ');
   const customerId = subscription.customer as string;
   const subscriptionId = subscription.id;
   const status = subscription.status;
@@ -134,6 +135,7 @@ export async function handleSubscriptionChange(
   }
 
   if (status === 'active' || status === 'trialing') {
+    console.log('SKRT SKRT')
     const subscriptionItem = subscription.items.data[0];
     const productId = subscriptionItem?.price.product as string;
     const quantity = subscriptionItem?.quantity || 1;
