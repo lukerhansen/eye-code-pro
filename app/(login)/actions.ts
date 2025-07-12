@@ -94,7 +94,8 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: foundTeam, priceId });
+    const quantity = parseInt(formData.get('quantity') as string) || 1;
+    return createCheckoutSession({ team: foundTeam, priceId, quantity });
   }
 
   redirect('/dashboard');
@@ -181,7 +182,8 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   } else {
     // Create a new team if there's no invitation
     const newTeam: NewTeam = {
-      name: `${email}'s Team`
+      name: `${email}'s Team`,
+      doctorLimit: 0
     };
 
     [createdTeam] = await db.insert(teams).values(newTeam).returning();
@@ -215,7 +217,8 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
     const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: createdTeam, priceId });
+    const quantity = parseInt(formData.get('quantity') as string) || 1;
+    return createCheckoutSession({ team: createdTeam, priceId, quantity });
   }
 
   redirect('/dashboard');

@@ -24,7 +24,7 @@ export function SubmitButton({ isPopular = false }: { isPopular?: boolean }) {
         </>
       ) : (
         <>
-          Start Free Trial
+          Upgrade Today
           <ArrowRight className="ml-2 h-4 w-4" />
         </>
       )}

@@ -1,7 +1,6 @@
-import { checkoutAction } from '@/lib/payments/actions';
-import { Check } from 'lucide-react';
 import { getStripePrices, getStripeProducts } from '@/lib/payments/stripe';
-import { SubmitButton } from './submit-button';
+import { PricingCard } from './pricing-card';
+import { SUBSCRIPTION_CONFIG } from '@/lib/config/subscription';
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
@@ -25,6 +24,12 @@ export default async function PricingPage() {
           Optimize your ophthalmology or optometry practice with our comprehensive insurance code platform. 
           Save time, reduce denials, and maximize your revenue.
         </p>
+        <p className="text-lg text-gray-600 mt-4">
+          Select the number of doctors in your practice to get started.
+        </p>
+        <p className="text-sm text-gray-500 mt-2">
+          A subscription is required to add doctors to your practice.
+        </p>
       </div>
       
       <div className="flex justify-center">
@@ -33,10 +38,14 @@ export default async function PricingPage() {
             name="Professional"
             price={basePrice?.unitAmount || 1}
             interval={basePrice?.interval || 'month'}
-            trialDays={basePrice?.trialPeriodDays || 7}
+            trialDays={SUBSCRIPTION_CONFIG.FREE_TRIAL_DAYS}
             features={[
-              'Lots of Benes',
-              'Dedicated account manager',
+              'Unlimited team members',
+              'All insurance code lookups',
+              'Real-time fee calculations',
+              'Insurance acceptance tracking',
+              'Custom fee schedules',
+              'Priority support',
             ]}
             priceId={basePrice?.id}
             isPopular={true}
@@ -53,59 +62,5 @@ export default async function PricingPage() {
         </p>
       </div>
     </main>
-  );
-}
-
-function PricingCard({
-  name,
-  price,
-  interval,
-  trialDays,
-  features,
-  priceId,
-  isPopular = false,
-}: {
-  name: string;
-  price: number;
-  interval: string;
-  trialDays: number;
-  features: string[];
-  priceId?: string;
-  isPopular?: boolean;
-}) {
-  return (
-    <div className={`relative pt-6 ${isPopular ? 'border-2 border-[#198bc4] rounded-lg' : ''}`}>
-      {isPopular && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <span className="bg-[#198bc4] text-white px-4 py-1 rounded-full text-sm font-medium">
-            Perfect Choice
-          </span>
-        </div>
-      )}
-      <div className={`${isPopular ? 'p-6' : 'pt-6'}`}>
-        <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          {trialDays} day free trial - no credit card required
-        </p>
-        <p className="text-4xl font-medium text-gray-900 mb-6">
-          ${price / 100}{' '}
-          <span className="text-xl font-normal text-gray-600">
-            per provider / {interval}
-          </span>
-        </p>
-        <ul className="space-y-4 mb-8">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-start">
-              <Check className="h-5 w-5 text-[#198bc4] mr-3 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">{feature}</span>
-            </li>
-          ))}
-        </ul>
-        <form action={checkoutAction}>
-          <input type="hidden" name="priceId" value={priceId} />
-          <SubmitButton isPopular={isPopular} />
-        </form>
-      </div>
-    </div>
   );
 }

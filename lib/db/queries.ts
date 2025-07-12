@@ -60,6 +60,7 @@ export async function updateTeamSubscription(
     stripeProductId: string | null;
     planName: string | null;
     subscriptionStatus: string;
+    doctorLimit?: number;
   }
 ) {
   await db

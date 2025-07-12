@@ -34,11 +34,13 @@ import type { Doctor } from '@/lib/db/schema';
 
 export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [usage, setUsage] = useState({ current: 0, limit: 1 });
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [formData, setFormData] = useState({ name: '', degree: '' });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDoctors();
@@ -50,6 +52,7 @@ export default function DoctorsPage() {
       const data = await response.json();
       if (response.ok) {
         setDoctors(data.doctors);
+        setUsage(data.usage);
       }
     } catch (error) {
       console.error('Error fetching doctors:', error);
@@ -59,6 +62,7 @@ export default function DoctorsPage() {
   };
 
   const handleAddDoctor = async () => {
+    setError(null);
     try {
       const response = await fetch('/api/doctors', {
         method: 'POST',
@@ -66,14 +70,21 @@ export default function DoctorsPage() {
         body: JSON.stringify(formData),
       });
       
+      const data = await response.json();
+      
       if (response.ok) {
-        const data = await response.json();
         setDoctors([...doctors, data.doctor]);
+        setUsage({ ...usage, current: usage.current + 1 });
         setIsAddDialogOpen(false);
         setFormData({ name: '', degree: '' });
+      } else if (response.status === 403) {
+        setError(data.message);
+      } else {
+        setError(data.error || 'Failed to add doctor');
       }
     } catch (error) {
       console.error('Error adding doctor:', error);
+      setError('Failed to add doctor');
     }
   };
 
@@ -113,6 +124,7 @@ export default function DoctorsPage() {
       
       if (response.ok) {
         setDoctors(doctors.filter(d => d.id !== doctor.id));
+        setUsage({ ...usage, current: usage.current - 1 });
       }
     } catch (error) {
       console.error('Error deleting doctor:', error);
@@ -143,10 +155,19 @@ export default function DoctorsPage() {
               <CardDescription>
                 Manage doctors in your practice and their insurance acceptances
               </CardDescription>
+              {usage.limit > 0 ? (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Using {usage.current} of {usage.limit} doctor{usage.limit !== 1 ? 's' : ''}
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Upgrade to add your first doctor
+                </div>
+              )}
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button disabled={usage.current >= usage.limit}>
                   <Plus className="mr-2 h-4 w-4" />
                   Add Doctor
                 </Button>
@@ -182,6 +203,22 @@ export default function DoctorsPage() {
                     </Select>
                   </div>
                 </div>
+                {error && (
+                  <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                    {error}
+                    {usage.current >= usage.limit && (
+                      <div className="mt-2">
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto text-red-600 underline"
+                          onClick={() => window.location.href = '/dashboard'}
+                        >
+                          Upgrade your plan
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <DialogFooter>
                   <Button 
                     type="submit" 
@@ -196,7 +233,33 @@ export default function DoctorsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {doctors.length === 0 ? (
+          {usage.current >= usage.limit && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+              <p className="text-sm text-amber-800">
+                You've reached your limit of {usage.limit} doctor{usage.limit !== 1 ? 's' : ''}. 
+                <Button
+                  variant="link"
+                  className="ml-1 p-0 h-auto text-amber-800 underline font-semibold"
+                  onClick={() => window.location.href = '/dashboard'}
+                >
+                  Upgrade your plan
+                </Button> to add more doctors.
+              </p>
+            </div>
+          )}
+          {usage.limit === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">
+                You need an active subscription to add doctors to your practice.
+              </p>
+              <Button
+                onClick={() => window.location.href = '/pricing'}
+                className="bg-teal-600 hover:bg-teal-700 text-white"
+              >
+                View Pricing Plans
+              </Button>
+            </div>
+          ) : doctors.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No doctors added yet. Click "Add Doctor" to get started.
             </div>

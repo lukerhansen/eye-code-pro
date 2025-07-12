@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Card,
   CardContent,
@@ -40,6 +40,13 @@ function SubscriptionSkeleton() {
 
 function ManageSubscription() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const { data: doctorsData } = useSWR('/api/doctors', fetcher);
+  const [portalState, portalAction, isPortalPending] = useActionState<
+    ActionState,
+    FormData
+  >(customerPortalAction, {});
+
+  const doctorUsage = doctorsData?.usage || { current: 0, limit: teamData?.doctorLimit || 1 };
 
   return (
     <Card className="mb-8">
@@ -60,13 +67,51 @@ function ManageSubscription() {
                   ? 'Trial period'
                   : 'No active subscription'}
               </p>
+              {doctorUsage.limit > 0 ? (
+                <div className="mt-2">
+                  <p className="text-sm font-medium">
+                    Doctors: {doctorUsage.current} of {doctorUsage.limit}
+                  </p>
+                  <div className="w-48 bg-gray-200 rounded-full h-2 mt-1">
+                    <div 
+                      className="bg-teal-600 h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${Math.min((doctorUsage.current / doctorUsage.limit) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-amber-600">
+                    Upgrade to add doctors
+                  </p>
+                </div>
+              )}
             </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
-                Manage Subscription
+            <form action={portalAction}>
+              <Button 
+                type="submit" 
+                variant="outline"
+                disabled={isPortalPending}
+              >
+                {isPortalPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Manage Subscription'
+                )}
               </Button>
             </form>
           </div>
+          {portalState?.error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <p className="text-red-800 text-sm">{portalState.error}</p>
+            </div>
+          )}
+          {portalState?.success && (
+            <p className="text-green-600 text-sm">{portalState.success}</p>
+          )}
         </div>
       </CardContent>
     </Card>

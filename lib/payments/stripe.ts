@@ -6,6 +6,7 @@ import {
   getUser,
   updateTeamSubscription
 } from '@/lib/db/queries';
+import { SUBSCRIPTION_CONFIG } from '@/lib/config/subscription';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil'
@@ -13,15 +14,17 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function createCheckoutSession({
   team,
-  priceId
+  priceId,
+  quantity = 1
 }: {
   team: Team | null;
   priceId: string;
+  quantity?: number;
 }) {
   const user = await getUser();
 
   if (!team || !user) {
-    redirect(`/sign-up?redirect=checkout&priceId=${priceId}`);
+    redirect(`/sign-up?redirect=checkout&priceId=${priceId}&quantity=${quantity}`);
   }
 
   const session = await stripe.checkout.sessions.create({
@@ -29,7 +32,7 @@ export async function createCheckoutSession({
     line_items: [
       {
         price: priceId,
-        quantity: 1
+        quantity: quantity
       }
     ],
     mode: 'subscription',
@@ -38,9 +41,11 @@ export async function createCheckoutSession({
     customer: team.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     allow_promotion_codes: true,
-    subscription_data: {
-      trial_period_days: 14
-    }
+    ...(SUBSCRIPTION_CONFIG.FREE_TRIAL_DAYS > 0 && {
+      subscription_data: {
+        trial_period_days: SUBSCRIPTION_CONFIG.FREE_TRIAL_DAYS
+      }
+    })
   });
 
   redirect(session.url!);
@@ -129,19 +134,30 @@ export async function handleSubscriptionChange(
   }
 
   if (status === 'active' || status === 'trialing') {
-    const plan = subscription.items.data[0]?.plan;
+    const subscriptionItem = subscription.items.data[0];
+    const productId = subscriptionItem?.price.product as string;
+    const quantity = subscriptionItem?.quantity || 1;
+    
+    // Fetch the product to get metadata
+    const product = await stripe.products.retrieve(productId);
+    
+    // Get doctor limit from quantity (subscription quantity = number of doctors)
+    const doctorLimit = quantity;
+    
     await updateTeamSubscription(team.id, {
       stripeSubscriptionId: subscriptionId,
-      stripeProductId: plan?.product as string,
-      planName: (plan?.product as Stripe.Product).name,
-      subscriptionStatus: status
+      stripeProductId: productId,
+      planName: product.name,
+      subscriptionStatus: status,
+      doctorLimit: doctorLimit
     });
   } else if (status === 'canceled' || status === 'unpaid') {
     await updateTeamSubscription(team.id, {
       stripeSubscriptionId: null,
       stripeProductId: null,
       planName: null,
-      subscriptionStatus: status
+      subscriptionStatus: status,
+      doctorLimit: 0
     });
   }
 }

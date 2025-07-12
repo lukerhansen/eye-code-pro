@@ -22,7 +22,13 @@ export async function GET() {
       .where(eq(doctors.teamId, team.id))
       .orderBy(doctors.name);
 
-    return NextResponse.json({ doctors: doctorsList });
+    return NextResponse.json({ 
+      doctors: doctorsList,
+      usage: {
+        current: doctorsList.length,
+        limit: team.doctorLimit
+      }
+    });
   } catch (error) {
     console.error('Error fetching doctors:', error);
     return NextResponse.json(
@@ -42,6 +48,24 @@ export async function POST(req: NextRequest) {
     const team = await getTeamForUser();
     if (!team) {
       return NextResponse.json({ error: 'No team found' }, { status: 404 });
+    }
+
+    // Check doctor limit
+    const currentDoctorCount = await db
+      .select()
+      .from(doctors)
+      .where(eq(doctors.teamId, team.id));
+    
+    if (currentDoctorCount.length >= team.doctorLimit) {
+      return NextResponse.json(
+        { 
+          error: 'Doctor limit reached',
+          message: `You have reached your limit of ${team.doctorLimit} doctors. Please upgrade your plan to add more doctors.`,
+          currentCount: currentDoctorCount.length,
+          limit: team.doctorLimit
+        },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();

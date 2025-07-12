@@ -37,7 +37,8 @@ export async function GET(request: NextRequest) {
       expand: ['items.data.price.product'],
     });
 
-    const plan = subscription.items.data[0]?.price;
+    const subscriptionItem = subscription.items.data[0];
+    const plan = subscriptionItem?.price;
 
     if (!plan) {
       throw new Error('No plan found for this subscription.');
@@ -48,6 +49,9 @@ export async function GET(request: NextRequest) {
     if (!productId) {
       throw new Error('No product ID found for this subscription.');
     }
+    
+    // Get the quantity which represents the number of doctors
+    const doctorLimit = subscriptionItem?.quantity || 1;
 
     const userId = session.client_reference_id;
     if (!userId) {
@@ -84,6 +88,7 @@ export async function GET(request: NextRequest) {
         stripeProductId: productId,
         planName: (plan.product as Stripe.Product).name,
         subscriptionStatus: subscription.status,
+        doctorLimit: doctorLimit,
         updatedAt: new Date(),
       })
       .where(eq(teams.id, userTeam[0].teamId));
