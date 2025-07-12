@@ -122,7 +122,18 @@ export async function createCustomerPortalSession(team: Team) {
 export async function handleSubscriptionChange(
   subscription: Stripe.Subscription
 ) {
-  console.log('hi luke from handle subscrption chagne ');
+  console.log('=== SUBSCRIPTION WEBHOOK RECEIVED ===');
+  console.log('Event data:', JSON.stringify({
+    subscriptionId: subscription.id,
+    status: subscription.status,
+    customer: subscription.customer,
+    items: subscription.items.data.map(item => ({
+      priceId: item.price.id,
+      productId: item.price.product,
+      quantity: item.quantity
+    }))
+  }, null, 2));
+  
   const customerId = subscription.customer as string;
   const subscriptionId = subscription.id;
   const status = subscription.status;
@@ -134,11 +145,18 @@ export async function handleSubscriptionChange(
     return;
   }
 
+  console.log('Team found:', { teamId: team.id, currentDoctorLimit: team.doctorLimit });
+
   if (status === 'active' || status === 'trialing') {
-    console.log('SKRT SKRT')
     const subscriptionItem = subscription.items.data[0];
     const productId = subscriptionItem?.price.product as string;
     const quantity = subscriptionItem?.quantity || 1;
+    
+    console.log('Processing active/trialing subscription:', {
+      productId,
+      quantity,
+      newDoctorLimit: quantity
+    });
     
     // Fetch the product to get metadata
     const product = await stripe.products.retrieve(productId);
@@ -146,12 +164,23 @@ export async function handleSubscriptionChange(
     // Get doctor limit from quantity (subscription quantity = number of doctors)
     const doctorLimit = quantity;
     
-    await updateTeamSubscription(team.id, {
+    const updateData = {
       stripeSubscriptionId: subscriptionId,
       stripeProductId: productId,
       planName: product.name,
       subscriptionStatus: status,
       doctorLimit: doctorLimit
+    };
+    
+    console.log('Updating team subscription with:', updateData);
+    
+    await updateTeamSubscription(team.id, updateData);
+    
+    // Verify the update
+    const updatedTeam = await getTeamByStripeCustomerId(customerId);
+    console.log('Team after update:', { 
+      teamId: updatedTeam?.id, 
+      newDoctorLimit: updatedTeam?.doctorLimit 
     });
   } else if (status === 'canceled' || status === 'unpaid') {
     await updateTeamSubscription(team.id, {

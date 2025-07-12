@@ -63,13 +63,30 @@ export async function updateTeamSubscription(
     doctorLimit?: number;
   }
 ) {
-  await db
+  console.log('=== DATABASE UPDATE ===');
+  console.log('Team ID:', teamId);
+  console.log('Update data:', JSON.stringify(subscriptionData, null, 2));
+  
+  const result = await db
     .update(teams)
     .set({
       ...subscriptionData,
       updatedAt: new Date()
     })
     .where(eq(teams.id, teamId));
+  
+  console.log('Update result:', result);
+  
+  // Verify the update by fetching the team again
+  const updatedTeam = await db
+    .select()
+    .from(teams)
+    .where(eq(teams.id, teamId))
+    .limit(1);
+  
+  console.log('Team after database update:', JSON.stringify(updatedTeam[0], null, 2));
+  
+  return result;
 }
 
 export async function getUserWithTeam(userId: number) {

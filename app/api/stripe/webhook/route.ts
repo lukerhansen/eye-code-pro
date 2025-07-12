@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
-  console.log('Hi from function POST in route.ts webhook');
+  console.log('=== STRIPE WEBHOOK RECEIVED ===');
   const payload = await request.text();
   const signature = request.headers.get('stripe-signature') as string;
 
@@ -13,6 +13,8 @@ export async function POST(request: NextRequest) {
 
   try {
     event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    console.log('Webhook event type:', event.type);
+    console.log('Webhook event ID:', event.id);
   } catch (err) {
     console.error('Webhook signature verification failed.', err);
     return NextResponse.json(
@@ -25,6 +27,7 @@ export async function POST(request: NextRequest) {
     case 'customer.subscription.created':
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted':
+      console.log(`Processing subscription event: ${event.type}`);
       const subscription = event.data.object as Stripe.Subscription;
       await handleSubscriptionChange(subscription);
       break;
