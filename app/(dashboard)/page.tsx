@@ -1,7 +1,28 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Eye, Shield, DollarSign } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { User } from '@/lib/db/schema';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function HomePage() {
+  const { data: user, isLoading } = useSWR<User>('/api/user', fetcher);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading || user) {
+    return null;
+  }
+
   return (
     <main>
       <section className="py-20">
@@ -19,13 +40,13 @@ export default function HomePage() {
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                 <a
-                  href="/pricing"
+                  href="/sign-up"
                 >
                   <Button
                     size="lg"
                     className="text-lg rounded-full bg-[#198bc4] hover:bg-[#0f7ba8] text-white"
                   >
-                    Start Saving Money
+                    Sign Up
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </a>
