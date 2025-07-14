@@ -73,7 +73,7 @@ function Header() {
     <header className="border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href={user ? "/dashboard" : "/"} className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-[#198bc4]" />
+          <img src="/dashboard-preview.png" alt="CodeSelect Logo" className="h-6 w-6" />
           <span className="ml-2 text-xl font-semibold text-gray-900">CodeSelect</span>
         </Link>
         <div className="flex items-center space-x-4">

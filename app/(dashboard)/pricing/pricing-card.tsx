@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Plus, Minus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { checkoutAction } from '@/lib/payments/actions';
 import { SubmitButton } from './submit-button';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ export function PricingCard({
   price,
   interval,
   trialDays,
-  features,
   priceId,
   isPopular = false,
 }: {
@@ -20,7 +19,6 @@ export function PricingCard({
   price: number;
   interval: string;
   trialDays: number;
-  features: string[];
   priceId?: string;
   isPopular?: boolean;
 }) {
@@ -31,15 +29,8 @@ export function PricingCard({
   };
 
   return (
-    <div className={`relative pt-6 ${isPopular ? 'border-2 border-[#198bc4] rounded-lg' : ''}`}>
-      {isPopular && (
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <span className="bg-[#198bc4] text-white px-4 py-1 rounded-full text-sm font-medium">
-            Perfect Choice
-          </span>
-        </div>
-      )}
-      <div className={`${isPopular ? 'p-6' : 'pt-6'}`}>
+    <div className={`${isPopular ? 'border-2 border-[#198bc4] rounded-lg p-6' : ''}`}>
+      <div>
         <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
         <p className="text-sm text-gray-600 mb-4">
           {trialDays > 0 ? `${trialDays} day free trial - no credit card required` : 'Start your subscription today'}
@@ -74,20 +65,12 @@ export function PricingCard({
         </div>
 
         <p className="text-4xl font-medium text-gray-900 mb-2">
-          ${(price / 100) * quantity}
+          ${((price / 100) * quantity).toFixed(2)}
         </p>
         <p className="text-sm text-gray-600 mb-6">
-          ${price / 100} per doctor / {interval}
+          ${(price / 100).toFixed(2)} per doctor / {interval}
         </p>
         
-        <ul className="space-y-4 mb-8">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-start">
-              <Check className="h-5 w-5 text-[#198bc4] mr-3 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">{feature}</span>
-            </li>
-          ))}
-        </ul>
         <form action={checkoutAction}>
           <input type="hidden" name="priceId" value={priceId} />
           <input type="hidden" name="quantity" value={quantity} />

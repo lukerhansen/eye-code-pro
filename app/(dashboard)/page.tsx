@@ -55,7 +55,7 @@ export default function HomePage() {
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
               <div className="w-full rounded-lg shadow-lg overflow-hidden flex items-center justify-center">
                 <img 
-                  src="/dashboard-preview.png?v=1" 
+                  src="/ppl_smiling_landing.png" 
                   alt="Dashboard Preview" 
                   className="w-3/4 h-auto"
                 />

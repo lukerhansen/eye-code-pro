@@ -18,7 +18,7 @@ export default async function PricingPage() {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Start Your CodeSelect Journey
+          Start Saving Money Today
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
           Optimize your ophthalmology or optometry practice with our comprehensive insurance code platform. 
@@ -39,14 +39,6 @@ export default async function PricingPage() {
             price={basePrice?.unitAmount || 1}
             interval={basePrice?.interval || 'month'}
             trialDays={SUBSCRIPTION_CONFIG.FREE_TRIAL_DAYS}
-            features={[
-              'Unlimited team members',
-              'All insurance code lookups',
-              'Real-time fee calculations',
-              'Insurance acceptance tracking',
-              'Custom fee schedules',
-              'Priority support',
-            ]}
             priceId={basePrice?.id}
             isPopular={true}
           />

@@ -283,6 +283,24 @@ export default function DoctorInsurancesPage() {
       });
 
       if (response.ok) {
+        const { insurance } = await response.json();
+        
+        // Automatically accept the newly created custom insurance
+        const acceptResponse = await fetch(`/api/doctors/${doctorId}/insurances`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            insurancePlanId: insurance.id,
+            isAccepted: true,
+            useCustomFeeSchedule: false,
+            coversFreeExam: newInsuranceCoversFreeExam,
+          }),
+        });
+        
+        if (!acceptResponse.ok) {
+          console.error('Failed to auto-accept custom insurance');
+        }
+        
         // Refresh the insurance list
         await fetchDoctorAndInsurances();
         setCustomInsuranceDialogOpen(false);
