@@ -156,14 +156,14 @@ export default function DoctorInsurancesPage() {
   const openFeeScheduleDialog = async (acceptance: InsuranceAcceptance) => {
     setEditingInsurance(acceptance);
     
-    // Fetch default fee schedules
+    // Fetch dynamic fee schedules using the same logic as code picker
     try {
-      const response = await fetch(`/api/insurance-fee-schedules?insurancePlanId=${acceptance.insurancePlan.id}`);
+      const response = await fetch(`/api/insurance-fee-schedules/dynamic?doctorId=${doctorId}&insurancePlanId=${acceptance.insurancePlan.id}`);
       const data = await response.json();
       if (response.ok) {
         setDefaultFees(data.feeSchedules);
         
-        // Initialize custom fees with existing values or defaults
+        // Initialize custom fees with existing values or dynamic defaults
         const initialFees: Record<string, string> = {};
         if (acceptance.useCustomFeeSchedule && acceptance.customFees.length > 0) {
           acceptance.customFees.forEach(fee => {
@@ -177,7 +177,7 @@ export default function DoctorInsurancesPage() {
         setCustomFees(initialFees);
       }
     } catch (error) {
-      console.error('Error fetching default fees:', error);
+      console.error('Error fetching dynamic fees:', error);
     }
     
     setFeeScheduleDialogOpen(true);
@@ -455,7 +455,7 @@ export default function DoctorInsurancesPage() {
           <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="grid grid-cols-3 gap-4 font-medium text-sm">
               <div>CPT Code</div>
-              <div>Default Rate</div>
+              <div>Current Rate</div>
               <div>Custom Rate</div>
             </div>
             

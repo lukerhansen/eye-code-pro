@@ -3,97 +3,20 @@ import { logBillingEntry, getUser, getTeamForUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { 
   doctors, 
-  doctorInsurances, 
-  insurancePlans,
-  defaultFeeSchedules,
-  customFeeSchedules 
+  insurancePlans
 } from '@/lib/db/schema';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
   DIAGNOSIS_ELIGIBILITY,
   getCodePair,
 } from '@/lib/insurance-data';
+import { getDynamicReimbursement } from '@/lib/insurance-utils';
 
 const DIAGNOSIS_CODE_MAP: Record<string, string> = {
   "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)": "H52.13",  
   "Medical diagnosis": "Z01.00",
 };
 
-// Helper function to get reimbursement from database
-async function getDynamicReimbursement(
-  doctorId: number, 
-  insurancePlanName: string, 
-  code: string,
-  teamState?: string | null
-): Promise<number> {
-  // First, get the insurance plan
-  const [insurancePlan] = await db
-    .select()
-    .from(insurancePlans)
-    .where(eq(insurancePlans.name, insurancePlanName))
-    .limit(1);
-
-  if (!insurancePlan) {
-    return 0;
-  }
-
-  // Check if doctor has custom fee schedule for this insurance
-  const doctorInsurance = await db
-    .select()
-    .from(doctorInsurances)
-    .where(and(
-      eq(doctorInsurances.doctorId, doctorId),
-      eq(doctorInsurances.insurancePlanId, insurancePlan.id)
-    ))
-    .limit(1);
-
-  if (doctorInsurance[0]?.useCustomFeeSchedule) {
-    // Get custom fee
-    const [customFee] = await db
-      .select()
-      .from(customFeeSchedules)
-      .where(and(
-        eq(customFeeSchedules.doctorInsuranceId, doctorInsurance[0].id),
-        eq(customFeeSchedules.code, code)
-      ))
-      .limit(1);
-
-    if (customFee) {
-      return customFee.amount / 100; // Convert cents to dollars
-    }
-  }
-
-  // Get state-specific fee schedule first, then fallback to global
-  let defaultFee;
-  
-  if (teamState) {
-    // Try to get state-specific fee schedule
-    [defaultFee] = await db
-      .select()
-      .from(defaultFeeSchedules)
-      .where(and(
-        eq(defaultFeeSchedules.insurancePlanId, insurancePlan.id),
-        eq(defaultFeeSchedules.code, code),
-        eq(defaultFeeSchedules.state, teamState)
-      ))
-      .limit(1);
-  }
-  
-  // If no state-specific fee found, try global default (state = null)
-  if (!defaultFee) {
-    [defaultFee] = await db
-      .select()
-      .from(defaultFeeSchedules)
-      .where(and(
-        eq(defaultFeeSchedules.insurancePlanId, insurancePlan.id),
-        eq(defaultFeeSchedules.code, code),
-        isNull(defaultFeeSchedules.state)
-      ))
-      .limit(1);
-  }
-
-  return defaultFee ? defaultFee.amount / 100 : 0;
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -106,6 +29,7 @@ export async function POST(req: NextRequest) {
     diagnosis,
     doctor,
     isEmergencyVisit = false,
+    otherSelectedAsInsurance = false,
   } = body;
 
   try {
@@ -137,15 +61,19 @@ export async function POST(req: NextRequest) {
       throw new Error('Doctor not found');
     }
 
-    // Get insurance plan info
-    const [insurancePlanRecord] = await db
-      .select()
-      .from(insurancePlans)
-      .where(eq(insurancePlans.name, insurancePlan))
-      .limit(1);
-
-    if (!insurancePlanRecord) {
-      throw new Error('Insurance plan not found');
+    // Get insurance plan info (skip if "Other" is selected)
+    let insurancePlanRecord = null;
+    if (!otherSelectedAsInsurance) {
+      const [plan] = await db
+        .select()
+        .from(insurancePlans)
+        .where(eq(insurancePlans.name, insurancePlan))
+        .limit(1);
+      
+      if (!plan) {
+        throw new Error('Insurance plan not found');
+      }
+      insurancePlanRecord = plan;
     }
 
     const isOD = doctorRecord.degree === 'OD';
@@ -161,7 +89,7 @@ export async function POST(req: NextRequest) {
       const actualLevel = level === 5 ? 4 : level;
       const [eyeCode] = getCodePair(patientType, actualLevel);
       recommendedCode = eyeCode;
-      const amount = await getDynamicReimbursement(doctorId, 'Medicaid', recommendedCode!, team.state);
+      const amount = await getDynamicReimbursement(doctorId, 'Medicaid', recommendedCode!, team.state, otherSelectedAsInsurance);
       rationale = `OD on Medicaid - always use eye code (92) ($${amount.toFixed(2)})`;
       if (level === 5) {
         rationale += ` - level ${level} bumped down to level ${actualLevel}`;
@@ -174,8 +102,8 @@ export async function POST(req: NextRequest) {
       const [eyeCode, emCode] = getCodePair(patientType, level);
       
       // Get reimbursements for both codes
-      const eyeCodeAmount = eyeCode ? await getDynamicReimbursement(doctorId, insurancePlan, eyeCode, team.state) : 0;
-      const emCodeAmount = emCode ? await getDynamicReimbursement(doctorId, insurancePlan, emCode, team.state) : 0;
+      const eyeCodeAmount = eyeCode ? await getDynamicReimbursement(doctorId, insurancePlan, eyeCode, team.state, otherSelectedAsInsurance) : 0;
+      const emCodeAmount = emCode ? await getDynamicReimbursement(doctorId, insurancePlan, emCode, team.state, otherSelectedAsInsurance) : 0;
       
       // Determine which code pays more
       if (eyeCodeAmount >= emCodeAmount) {
@@ -187,7 +115,7 @@ export async function POST(req: NextRequest) {
       const amount = Math.max(eyeCodeAmount, emCodeAmount);
       rationale = `Standard billing - highest-paying code for ${insurancePlan} ($${amount.toFixed(2)})`;
       
-      const hasFreeExam = insurancePlanRecord.coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
+      const hasFreeExam = insurancePlanRecord?.coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
         diagnosisCode = "Z01.00"

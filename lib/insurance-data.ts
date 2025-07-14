@@ -190,4 +190,17 @@ export function higherPayingCodeWithDebug(code1: string | null, code2: string | 
       insurancePlan
     }
   };
+}
+
+// Check if insurance name contains "medicare" or "medicaid" (case-insensitive)
+export function isMedicareOrMedicaidInsurance(insuranceName: string): boolean {
+  const lowerName = insuranceName.toLowerCase();
+  return lowerName.includes('medicare') || lowerName.includes('medicaid');
+}
+
+// Get hardcoded fallback rates based on insurance type
+export function getHardcodedFallbackRate(insuranceName: string, code: string): number {
+  const isMedicareOrMedicaid = isMedicareOrMedicaidInsurance(insuranceName);
+  const fallbackPlan = isMedicareOrMedicaid ? 'Medicare' : 'default_private_insurance';
+  return CODE_REIMBURSEMENT[fallbackPlan]?.[code] ?? 0;
 } 

@@ -115,18 +115,32 @@ export default function CodePickerPage() {
 
     setOutput("Calculating…");
     try {
+      // Check if "Other" option is selected
+      const isOtherMedicareMedicaid = (selectedInsurance as any)?.value === "other-medicare-medicaid";
+      const isOtherPrivate = (selectedInsurance as any)?.value === "other-private";
+      const otherSelectedAsInsurance = isOtherMedicareMedicaid || isOtherPrivate;
+      
+      // For "Other" options, use appropriate insurance name for fallback calculation
+      let insurancePlanName = selectedInsurance.name;
+      if (isOtherMedicareMedicaid) {
+        insurancePlanName = "Medicare"; // This will trigger Medicare/Medicaid fallback rates
+      } else if (isOtherPrivate) {
+        insurancePlanName = "Private"; // This will trigger private insurance fallback rates
+      }
+      
       const res = await fetch("/api/code-picker", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           doctorId: selectedDoctor.id,
-          insurancePlan: selectedInsurance.name,
+          insurancePlan: insurancePlanName,
           freeExamBilledLastYear: freeExamBilled,
           patientType,
           level,
           diagnosis,
           doctor: selectedDoctor.name,
           isEmergencyVisit,
+          otherSelectedAsInsurance,
         }),
       });
       const data = await res.json();
@@ -218,10 +232,26 @@ export default function CodePickerPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Insurance plan</label>
           <Select
-            value={selectedInsurance?.id.toString()}
+            value={(selectedInsurance as any)?.value || selectedInsurance?.id.toString()}
             onValueChange={(value) => {
-              const insurance = acceptedInsurances.find(i => i.id === parseInt(value));
-              setSelectedInsurance(insurance || null);
+              if (value === "other-medicare-medicaid") {
+                setSelectedInsurance({ 
+                  id: -1, 
+                  name: "Other (Medicare/Medicaid)", 
+                  coversFreeExam: false,
+                  value: "other-medicare-medicaid" 
+                } as any);
+              } else if (value === "other-private") {
+                setSelectedInsurance({ 
+                  id: -2, 
+                  name: "Other (Private)", 
+                  coversFreeExam: false,
+                  value: "other-private" 
+                } as any);
+              } else {
+                const insurance = acceptedInsurances.find(i => i.id === parseInt(value));
+                setSelectedInsurance(insurance || null);
+              }
             }}
             disabled={acceptedInsurances.length === 0}
           >
@@ -234,6 +264,16 @@ export default function CodePickerPage() {
                   {insurance.name}
                 </SelectItem>
               ))}
+              {acceptedInsurances.length > 0 && (
+                <>
+                  <SelectItem key="other-medicare-medicaid" value="other-medicare-medicaid">
+                    Other (Medicare/Medicaid)
+                  </SelectItem>
+                  <SelectItem key="other-private" value="other-private">
+                    Other (Private)
+                  </SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
