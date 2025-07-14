@@ -140,41 +140,44 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 bg-grid-gray-100/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
+      
+      <div className="relative max-w-md w-full">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome!</h2>
-          <p className="mt-2 text-gray-600">Let's set up your practice</p>
+          <h2 className="text-3xl font-light text-gray-900">Welcome to your practice</h2>
+          <p className="mt-2 text-base text-gray-600">Let's optimize your revenue in 2 minutes</p>
         </div>
 
         <div className="mb-8">
           <div className="flex items-center justify-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-              step >= 1 ? 'bg-teal-600 text-white' : 'bg-gray-300 text-gray-500'
-            }`}>
+            <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${
+              step >= 1 ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg' : 'bg-gray-200 text-gray-400'
+            } transition-all duration-300`}>
               1
             </div>
-            <div className={`w-24 h-1 ${step >= 2 ? 'bg-teal-600' : 'bg-gray-300'}`} />
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-              step >= 2 ? 'bg-teal-600 text-white' : 'bg-gray-300 text-gray-500'
-            }`}>
+            <div className={`w-24 h-0.5 ${step >= 2 ? 'bg-gradient-to-r from-teal-600 to-cyan-600' : 'bg-gray-200'} transition-all duration-300`} />
+            <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${
+              step >= 2 ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg' : 'bg-gray-200 text-gray-400'
+            } transition-all duration-300`}>
               2
             </div>
           </div>
         </div>
 
         {step === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
+          <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8">
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-4">
+                <Building2 className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 mb-2">
                 Practice Information
-              </CardTitle>
-              <CardDescription>
+              </h3>
+              <p className="text-gray-600">
                 What's the name of your practice?
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </p>
+            </div>
               <form onSubmit={handleStep1Submit} className="space-y-4">
                 <div>
                   <Label htmlFor="practiceName">Practice Name</Label>
@@ -185,13 +188,13 @@ export default function OnboardingPage() {
                     onChange={(e) => setPracticeName(e.target.value)}
                     placeholder="Enter your practice name"
                     required
-                    className="mt-1"
+                    className="mt-2 rounded-xl border-gray-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200"
                   />
                 </div>
                 <div className="flex gap-2">
                   <Button
                     type="submit"
-                    className="flex-1 bg-teal-600 hover:bg-teal-700"
+                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                     disabled={!practiceName.trim() || isNamePending}
                   >
                     {isNamePending ? (
@@ -210,27 +213,28 @@ export default function OnboardingPage() {
                     type="button"
                     variant="outline"
                     onClick={handleSkip}
+                    className="rounded-xl border-gray-200 hover:bg-gray-50 transition-all duration-200"
                   >
                     Skip
                   </Button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
+          </div>
         )}
 
         {step === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
+          <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8">
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-4">
+                <MapPin className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 mb-2">
                 Practice Location
-              </CardTitle>
-              <CardDescription>
-                Select your practice's state for accurate insurance reimbursement rates
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              </h3>
+              <p className="text-gray-600">
+                Select your state for accurate reimbursement rates
+              </p>
+            </div>
               <form onSubmit={handleStep2Submit} className="space-y-4">
                 <div>
                   <Label htmlFor="state">Practice State</Label>
@@ -239,7 +243,7 @@ export default function OnboardingPage() {
                     onValueChange={setState}
                     required
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-2 rounded-xl border-gray-200 focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200">
                       <SelectValue placeholder="Select your state" />
                     </SelectTrigger>
                     <SelectContent>
@@ -253,7 +257,7 @@ export default function OnboardingPage() {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-teal-600 hover:bg-teal-700"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isSubmitting || isStatePending}
                 >
                   {isSubmitting || isStatePending ? (
@@ -269,8 +273,7 @@ export default function OnboardingPage() {
                   )}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+          </div>
         )}
       </div>
     </div>

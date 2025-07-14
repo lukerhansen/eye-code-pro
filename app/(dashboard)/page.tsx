@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Eye, Shield, DollarSign } from 'lucide-react';
+import { ArrowRight, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -24,91 +24,124 @@ export default function HomePage() {
   }
 
   return (
-    <main>
-      <section className="py-20">
+    <main className="relative min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="absolute inset-0 bg-grid-gray-100/50 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
+      
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-                Master Eye Care
-                <span className="block text-[#198bc4]">Insurance Codes</span>
+          <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
+            <div className="lg:col-span-7">
+              <h1 className="text-5xl font-light text-gray-900 tracking-tight sm:text-6xl">
+                Auto-rank CPT codes.
+                <span className="block font-normal text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
+                  Maximize revenue.
+                </span>
               </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                Streamline your ophthalmology or optometry practice with AI-powered insurance code selection. 
-                Reduce claim denials, maximize reimbursements, and save hours of 
-                administrative work with our sophisticated coding platform.
+              
+              <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+                Point-of-care intelligence that instantly selects the highest-value compliant code 
+                for every patient visit. Built on each payer's specific rules.
               </p>
-              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <a
-                  href="/sign-up"
-                >
+              
+              <div className="mt-10">
+                <a href="/sign-up">
                   <Button
                     size="lg"
-                    className="text-lg rounded-full bg-[#198bc4] hover:bg-[#0f7ba8] text-white"
+                    className="px-8 py-6 text-base font-medium rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                   >
-                    Sign Up
+                    Start Saving Today
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </a>
               </div>
             </div>
-            <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <div className="w-full rounded-lg shadow-lg overflow-hidden flex items-center justify-center">
-                <img 
-                  src="/ppl_smiling_landing.png" 
-                  alt="Dashboard Preview" 
-                  className="w-3/4 h-auto"
-                />
+            
+            <div className="mt-16 lg:mt-0 lg:col-span-5">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-3xl blur-3xl opacity-20" />
+                <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 p-8">
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
+                        92 vs 99
+                      </div>
+                      <p className="mt-2 text-gray-600">Auto-ranked by fee schedule</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
+                      <div className="text-center">
+                        <div className="text-3xl font-semibold text-gray-900">3%</div>
+                        <p className="text-sm text-gray-600 mt-1">Revenue lift</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-semibold text-gray-900">2min</div>
+                        <p className="text-sm text-gray-600 mt-1">Per claim saved</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-white w-full">
+      <section className="relative py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-            <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
-                <Eye className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Eye Care Expertise
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Specialized knowledge of eye care procedures and their corresponding 
-                  insurance codes. Built by experts who understand ophthalmology and optometry practice needs.
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-light text-gray-900">
+              Transform chaos into confidence
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Rules-driven workflow that adds dollars and removes anxiety
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 hover:border-teal-200 transition-all duration-300">
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-6">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">
+                  Immediate financial lift
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Auto-ranks 92 vs 99 codes by current fee schedule for each payer, 
+                  level, and patient type—before submission.
                 </p>
               </div>
             </div>
-
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
-                <Shield className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Compliance & Accuracy
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Reduce claim denials with our comprehensive database of current 
-                  codes and real-time validation for optimal reimbursement rates.
+            
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 hover:border-teal-200 transition-all duration-300">
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-6">
+                  <ShieldCheck className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">
+                  Bulletproof compliance
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Bakes each plan's unique rules into the engine—free exam limits, 
+                  provider restrictions, emergency exceptions.
                 </p>
               </div>
             </div>
-
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-[#198bc4] text-white">
-                <DollarSign className="h-6 w-6" />
-              </div>
-              <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
-                  Maximize Revenue
-                </h2>
-                <p className="mt-2 text-base text-gray-500">
-                  Increase practice profitability by ensuring proper code selection 
-                  and reducing administrative overhead. Save time and money.
+            
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+              <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 hover:border-teal-200 transition-all duration-300">
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-6">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-3">
+                  Point-of-care speed
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Staff answers simple questions. System returns the optimal code 
+                  with rationale. No tables, no guesswork.
                 </p>
               </div>
             </div>
@@ -116,29 +149,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Ready to optimize your practice?
-              </h2>
-              <p className="mt-3 max-w-3xl text-lg text-gray-500">
-                Join eye care professionals who trust CodeSelect to 
-                streamline their coding process and maximize their revenue potential.
-              </p>
-            </div>
-            <div className="mt-8 lg:mt-0 flex justify-center lg:justify-end">
-              <a href="/pricing">
+      <section className="relative py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="absolute inset-0 bg-grid-gray-100/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
+        
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-12 shadow-xl border border-gray-100">
+            <h2 className="text-3xl font-light text-gray-900 mb-4">
+              Start capturing revenue you're leaving on the table
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Join practices achieving 3% average revenue lift with zero additional effort
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/sign-up">
                 <Button
                   size="lg"
-                  className="text-lg rounded-full bg-[#198bc4] hover:bg-[#0f7ba8] text-white"
+                  className="px-8 py-6 text-base font-medium rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Get Started Today
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  Start Saving Today
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </a>
             </div>
+            <p className="mt-6 text-sm text-gray-500">
+              Setup in 5 minutes • Cancel anytime
+            </p>
+            <p className="mt-4 text-xs text-gray-400">
+              © {new Date().getFullYear()} CodeSelect. All rights reserved.
+            </p>
           </div>
         </div>
       </section>

@@ -8,6 +8,11 @@ import { ActionState } from '@/lib/auth/middleware';
 export const checkoutAction = withTeam(async (formData, team) => {
   const priceId = formData.get('priceId') as string;
   const quantity = parseInt(formData.get('quantity') as string) || 1;
+  
+  if (!priceId) {
+    throw new Error('No pricing information available. Please ensure Stripe is configured correctly.');
+  }
+  
   await createCheckoutSession({ team: team, priceId, quantity });
 });
 

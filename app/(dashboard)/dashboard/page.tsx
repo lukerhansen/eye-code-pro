@@ -49,11 +49,13 @@ function ManageSubscription() {
   const doctorUsage = doctorsData?.usage || { current: 0, limit: teamData?.doctorLimit || 1 };
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="relative mb-8">
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-400/5 to-cyan-400/5 rounded-3xl" />
+      <Card className="relative bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
+        <CardHeader>
+          <CardTitle className="font-light">Subscription</CardTitle>
+        </CardHeader>
+        <CardContent>
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div className="mb-4 sm:mb-0">
@@ -113,8 +115,9 @@ function ManageSubscription() {
             <p className="text-green-600 text-sm">{portalState.success}</p>
           )}
         </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -209,10 +212,12 @@ function PracticeInformation() {
   const currentStateLabel = US_STATES.find(state => state.value === currentState)?.label;
 
   return (
-    <Card className="mb-8">
+    <Card className="mb-8 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 font-light">
+          <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-r from-teal-50 to-cyan-50">
+            <MapPin className="h-4 w-4 text-teal-600" />
+          </div>
           Practice Information
         </CardTitle>
       </CardHeader>
@@ -292,10 +297,12 @@ function PracticeName() {
   }, [isUpdatePending, updateState.success, mutate]);
 
   return (
-    <Card className="mb-8">
+    <Card className="mb-8 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 font-light">
+          <div className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-gradient-to-r from-teal-50 to-cyan-50">
+            <Building2 className="h-4 w-4 text-teal-600" />
+          </div>
           Practice Details
         </CardTitle>
       </CardHeader>
@@ -374,9 +381,9 @@ function TeamMembers() {
 
   if (!teamData?.teamMembers?.length) {
     return (
-      <Card className="mb-8">
+      <Card className="mb-8 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
         <CardHeader>
-          <CardTitle>Practice Staff</CardTitle>
+          <CardTitle className="font-light">Practice Staff</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">No practice staff added yet.</p>
@@ -386,9 +393,9 @@ function TeamMembers() {
   }
 
   return (
-    <Card className="mb-8">
+    <Card className="mb-8 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
       <CardHeader>
-        <CardTitle>Practice Staff</CardTitle>
+        <CardTitle className="font-light">Practice Staff</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
@@ -455,9 +462,9 @@ function InviteTeamMember() {
   >(inviteTeamMember, {});
 
   return (
-    <Card>
+    <Card className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-3xl">
       <CardHeader>
-        <CardTitle>Invite Staff Member</CardTitle>
+        <CardTitle className="font-light">Invite Staff Member</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={inviteAction} className="space-y-4">
@@ -500,7 +507,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -530,23 +537,26 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Practice Management</h1>
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
-      </Suspense>
-      <Suspense fallback={<PracticeNameSkeleton />}>
-        <PracticeName />
-      </Suspense>
-      <Suspense fallback={<PracticeInformationSkeleton />}>
-        <PracticeInformation />
-      </Suspense>
-      <Suspense fallback={<TeamMembersSkeleton />}>
-        <TeamMembers />
-      </Suspense>
-      <Suspense fallback={<InviteTeamMemberSkeleton />}>
-        <InviteTeamMember />
-      </Suspense>
+    <section className="flex-1 p-4 lg:p-8 relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-transparent pointer-events-none" />
+      <h1 className="relative text-2xl lg:text-3xl font-light text-gray-900 mb-8">Practice Management</h1>
+      <div className="relative space-y-6">
+        <Suspense fallback={<SubscriptionSkeleton />}>
+          <ManageSubscription />
+        </Suspense>
+        <Suspense fallback={<PracticeNameSkeleton />}>
+          <PracticeName />
+        </Suspense>
+        <Suspense fallback={<PracticeInformationSkeleton />}>
+          <PracticeInformation />
+        </Suspense>
+        <Suspense fallback={<TeamMembersSkeleton />}>
+          <TeamMembers />
+        </Suspense>
+        <Suspense fallback={<InviteTeamMemberSkeleton />}>
+          <InviteTeamMember />
+        </Suspense>
+      </div>
     </section>
   );
 }

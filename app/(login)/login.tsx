@@ -22,25 +22,30 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <img src="/dashboard-preview.png" alt="CodeSelect Logo" className="h-12 w-12" />
+    <div className="relative min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+      <div className="absolute inset-0 bg-grid-gray-100/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
+      
+      <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 mb-6">
+            <CircleIcon className="h-8 w-8 text-teal-600" />
+          </div>
+          <h2 className="text-3xl font-light text-gray-900">
+            {mode === 'signin'
+              ? 'Welcome back'
+              : 'Create your account'}
+          </h2>
+          <p className="mt-2 text-base text-gray-600">
+            {mode === 'signin'
+              ? 'Sign in to access your coding platform'
+              : 'Start capturing missed revenue today'}
+          </p>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {mode === 'signin'
-            ? 'Sign in to your practice'
-            : 'Join your practice'}
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          {mode === 'signin'
-            ? 'Access your eye care coding platform'
-            : 'Start optimizing your insurance codes today'}
-        </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <form className="space-y-6" action={formAction}>
+      <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8">
+          <form className="space-y-6" action={formAction}>
           <input type="hidden" name="redirect" value={redirect || ''} />
           <input type="hidden" name="priceId" value={priceId || ''} />
           <input type="hidden" name="inviteId" value={inviteId || ''} />
@@ -60,7 +65,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 defaultValue={state.email}
                 required
                 maxLength={50}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200"
                 placeholder="Enter your email"
               />
             </div>
@@ -85,7 +90,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 required
                 minLength={8}
                 maxLength={100}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all duration-200"
                 placeholder="Enter your password"
               />
             </div>
@@ -98,7 +103,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                   id="acceptTos"
                   name="acceptTos"
                   required
-                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-teal-600 focus:ring-teal-500/20 border-gray-200 rounded"
                 />
               </div>
               <div className="ml-3 text-sm">
@@ -123,7 +128,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <div>
             <Button
               type="submit"
-              className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+              className="w-full flex justify-center items-center py-3 px-6 rounded-xl text-base font-medium bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
               disabled={pending}
             >
               {pending ? (
@@ -138,33 +143,34 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               )}
             </Button>
           </div>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                {mode === 'signin'
-                  ? 'New to the platform?'
-                  : 'Already have an account?'}
-              </span>
-            </div>
-          </div>
+          </form>
 
           <div className="mt-6">
-            <Link
-              href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${
-                redirect ? `?redirect=${redirect}` : ''
-              }${priceId ? `&priceId=${priceId}` : ''}`}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-            >
-              {mode === 'signin'
-                ? 'Create an account'
-                : 'Sign in to existing account'}
-            </Link>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-3 bg-white text-gray-500">
+                  {mode === 'signin'
+                    ? 'New to the platform?'
+                    : 'Already have an account?'}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Link
+                href={`${mode === 'signin' ? '/sign-up' : '/sign-in'}${
+                  redirect ? `?redirect=${redirect}` : ''
+                }${priceId ? `&priceId=${priceId}` : ''}`}
+                className="w-full flex justify-center py-3 px-4 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white/50 hover:bg-gray-50 transition-all duration-200"
+              >
+                {mode === 'signin'
+                  ? 'Create an account'
+                  : 'Sign in to existing account'}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
