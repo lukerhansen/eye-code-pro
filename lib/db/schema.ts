@@ -198,6 +198,7 @@ export const doctorInsurances = pgTable('doctor_insurances', {
     .references(() => insurancePlans.id),
   isAccepted: boolean('is_accepted').notNull().default(true),
   useCustomFeeSchedule: boolean('use_custom_fee_schedule').notNull().default(false),
+  coversFreeExam: boolean('covers_free_exam'), // NULL = use insurance default, TRUE/FALSE = override
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

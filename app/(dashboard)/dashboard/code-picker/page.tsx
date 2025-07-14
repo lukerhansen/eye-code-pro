@@ -87,7 +87,11 @@ export default function CodePickerPage() {
       if (response.ok) {
         const accepted = data.insuranceAcceptances
           .filter((ia: any) => ia.isAccepted)
-          .map((ia: any) => ia.insurancePlan);
+          .map((ia: any) => ({
+            ...ia.insurancePlan,
+            // Include the doctor-specific coversFreeExam override
+            coversFreeExam: ia.coversFreeExam !== null ? ia.coversFreeExam : ia.insurancePlan.coversFreeExam
+          }));
         
         // Sort to prioritize Medicare and Medicaid
         const sortedAccepted = accepted.sort((a: any, b: any) => {

@@ -23,13 +23,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Save, DollarSign, Plus, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, DollarSign, Plus, Trash2 } from 'lucide-react';
 import type { Doctor, InsurancePlan } from '@/lib/db/schema';
 
 interface InsuranceAcceptance {
   insurancePlan: InsurancePlan;
   isAccepted: boolean;
   useCustomFeeSchedule: boolean;
+  coversFreeExam: boolean | null; // null = use insurance default
   doctorInsuranceId?: number;
   customFees: { code: string; amount: number }[];
 }
@@ -61,7 +62,6 @@ export default function DoctorInsurancesPage() {
   const [customInsuranceDialogOpen, setCustomInsuranceDialogOpen] = useState(false);
   const [newInsuranceName, setNewInsuranceName] = useState('');
   const [newInsuranceCoversFreeExam, setNewInsuranceCoversFreeExam] = useState(false);
-  const [editingCustomInsurance, setEditingCustomInsurance] = useState<InsurancePlan | null>(null);
   const [savingCustomInsurance, setSavingCustomInsurance] = useState(false);
 
   useEffect(() => {
@@ -128,6 +128,7 @@ export default function DoctorInsurancesPage() {
           insurancePlanId: planId,
           isAccepted,
           useCustomFeeSchedule: false,
+          coversFreeExam: acceptance.coversFreeExam,
         }),
       });
 
@@ -148,6 +149,53 @@ export default function DoctorInsurancesPage() {
           : ia
       ));
       console.error('Error updating acceptance:', error);
+    } finally {
+      setSavingStates(prev => ({ ...prev, [planId]: false }));
+    }
+  };
+
+  const handleFreeExamOverrideChange = async (acceptance: InsuranceAcceptance, coversFreeExam: boolean | null) => {
+    const planId = acceptance.insurancePlan.id;
+    
+    // Optimistic update
+    setInsuranceAcceptances(insuranceAcceptances.map(ia => 
+      ia.insurancePlan.id === planId
+        ? { ...ia, coversFreeExam }
+        : ia
+    ));
+    
+    setSavingStates(prev => ({ ...prev, [planId]: true }));
+    
+    try {
+      const response = await fetch(`/api/doctors/${doctorId}/insurances`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          insurancePlanId: planId,
+          isAccepted: acceptance.isAccepted,
+          useCustomFeeSchedule: acceptance.useCustomFeeSchedule,
+          coversFreeExam,
+          customFees: acceptance.customFees,
+        }),
+      });
+
+      if (!response.ok) {
+        // Revert on failure
+        setInsuranceAcceptances(insuranceAcceptances.map(ia => 
+          ia.insurancePlan.id === planId
+            ? { ...ia, coversFreeExam: acceptance.coversFreeExam }
+            : ia
+        ));
+        console.error('Error updating free exam override');
+      }
+    } catch (error) {
+      // Revert on failure
+      setInsuranceAcceptances(insuranceAcceptances.map(ia => 
+        ia.insurancePlan.id === planId
+          ? { ...ia, coversFreeExam: acceptance.coversFreeExam }
+          : ia
+      ));
+      console.error('Error updating free exam override:', error);
     } finally {
       setSavingStates(prev => ({ ...prev, [planId]: false }));
     }
@@ -204,6 +252,7 @@ export default function DoctorInsurancesPage() {
           insurancePlanId: planId,
           isAccepted: true,
           useCustomFeeSchedule: useCustom,
+          coversFreeExam: editingInsurance.coversFreeExam,
           customFees: customFeeData,
         }),
       });
@@ -251,38 +300,6 @@ export default function DoctorInsurancesPage() {
     }
   };
 
-  const handleUpdateCustomInsurance = async () => {
-    if (!editingCustomInsurance || !newInsuranceName.trim()) return;
-    
-    setSavingCustomInsurance(true);
-    try {
-      const response = await fetch('/api/insurances/custom', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: editingCustomInsurance.id,
-          name: newInsuranceName.trim(),
-          coversFreeExam: newInsuranceCoversFreeExam,
-        }),
-      });
-
-      if (response.ok) {
-        await fetchDoctorAndInsurances();
-        setEditingCustomInsurance(null);
-        setCustomInsuranceDialogOpen(false);
-        setNewInsuranceName('');
-        setNewInsuranceCoversFreeExam(false);
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to update custom insurance');
-      }
-    } catch (error) {
-      console.error('Error updating custom insurance:', error);
-      alert('Failed to update custom insurance');
-    } finally {
-      setSavingCustomInsurance(false);
-    }
-  };
 
   const handleDeleteCustomInsurance = async (insuranceId: number) => {
     if (!confirm('Are you sure you want to delete this custom insurance? This action cannot be undone.')) {
@@ -306,12 +323,6 @@ export default function DoctorInsurancesPage() {
     }
   };
 
-  const openEditCustomInsurance = (insurance: InsurancePlan) => {
-    setEditingCustomInsurance(insurance);
-    setNewInsuranceName(insurance.name);
-    setNewInsuranceCoversFreeExam(insurance.coversFreeExam);
-    setCustomInsuranceDialogOpen(true);
-  };
 
   if (loading) {
     return (
@@ -352,7 +363,6 @@ export default function DoctorInsurancesPage() {
           <div className="mb-4 flex justify-end">
             <Button
               onClick={() => {
-                setEditingCustomInsurance(null);
                 setNewInsuranceName('');
                 setNewInsuranceCoversFreeExam(false);
                 setCustomInsuranceDialogOpen(true);
@@ -394,7 +404,26 @@ export default function DoctorInsurancesPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {acceptance.insurancePlan.coversFreeExam ? 'Yes' : 'No'}
+                    {acceptance.isAccepted ? (
+                      <select
+                        className="text-sm border rounded px-3 py-1.5 bg-white"
+                        value={acceptance.coversFreeExam === null ? 'default' : acceptance.coversFreeExam ? 'yes' : 'no'}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const newValue = value === 'default' ? null : value === 'yes';
+                          handleFreeExamOverrideChange(acceptance, newValue);
+                        }}
+                        disabled={savingStates[acceptance.insurancePlan.id] || false}
+                      >
+                        <option value="default">Default ({acceptance.insurancePlan.coversFreeExam ? 'Yes' : 'No'})</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                      </select>
+                    ) : (
+                      <span className="text-sm text-gray-400">
+                        {acceptance.insurancePlan.coversFreeExam ? 'Yes' : 'No'}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {acceptance.isAccepted && (
@@ -416,22 +445,13 @@ export default function DoctorInsurancesPage() {
                         </Button>
                       )}
                       {acceptance.insurancePlan.isCustom && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEditCustomInsurance(acceptance.insurancePlan)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteCustomInsurance(acceptance.insurancePlan.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCustomInsurance(acceptance.insurancePlan.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
                       )}
                     </div>
                   </TableCell>
@@ -508,7 +528,7 @@ export default function DoctorInsurancesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingCustomInsurance ? 'Edit Custom Insurance' : 'Add Custom Insurance'}
+              Add Custom Insurance
             </DialogTitle>
             <DialogDescription>
               Create a custom insurance plan for your organization
@@ -543,7 +563,6 @@ export default function DoctorInsurancesPage() {
               variant="outline"
               onClick={() => {
                 setCustomInsuranceDialogOpen(false);
-                setEditingCustomInsurance(null);
                 setNewInsuranceName('');
                 setNewInsuranceCoversFreeExam(false);
               }}
@@ -552,10 +571,10 @@ export default function DoctorInsurancesPage() {
               Cancel
             </Button>
             <Button
-              onClick={editingCustomInsurance ? handleUpdateCustomInsurance : handleCreateCustomInsurance}
+              onClick={handleCreateCustomInsurance}
               disabled={savingCustomInsurance || !newInsuranceName.trim()}
             >
-              {savingCustomInsurance ? 'Saving...' : (editingCustomInsurance ? 'Update' : 'Create')}
+              {savingCustomInsurance ? 'Saving...' : 'Create'}
             </Button>
           </DialogFooter>
         </DialogContent>

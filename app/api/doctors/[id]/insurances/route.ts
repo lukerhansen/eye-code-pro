@@ -78,6 +78,7 @@ export async function GET(
         insurancePlan: plan,
         isAccepted: acceptance?.doctorInsurance.isAccepted ?? false,
         useCustomFeeSchedule: acceptance?.doctorInsurance.useCustomFeeSchedule ?? false,
+        coversFreeExam: acceptance?.doctorInsurance.coversFreeExam ?? null,
         doctorInsuranceId: acceptance?.doctorInsurance.id,
         customFees: customFeesForPlan.map(cf => ({
           code: cf.custom_fee_schedules.code,
@@ -114,7 +115,7 @@ export async function POST(
     const resolvedParams = await params;
     const doctorId = parseInt(resolvedParams.id);
     const body = await req.json();
-    const { insurancePlanId, isAccepted, useCustomFeeSchedule, customFees } = body;
+    const { insurancePlanId, isAccepted, useCustomFeeSchedule, coversFreeExam, customFees } = body;
 
     // Verify doctor belongs to team
     const [doctor] = await db
@@ -146,6 +147,7 @@ export async function POST(
         .set({
           isAccepted,
           useCustomFeeSchedule,
+          coversFreeExam,
           updatedAt: new Date(),
         })
         .where(eq(doctorInsurances.id, existing[0].id))
@@ -166,6 +168,7 @@ export async function POST(
         insurancePlanId,
         isAccepted,
         useCustomFeeSchedule,
+        coversFreeExam,
       };
 
       const [inserted] = await db

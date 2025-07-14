@@ -3,7 +3,8 @@ import { logBillingEntry, getUser, getTeamForUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { 
   doctors, 
-  insurancePlans
+  insurancePlans,
+  doctorInsurances
 } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 import {
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
 
     // Get insurance plan info (skip if "Other" is selected)
     let insurancePlanRecord = null;
+    let doctorInsuranceRecord = null;
     if (!otherSelectedAsInsurance) {
       const [plan] = await db
         .select()
@@ -68,6 +70,18 @@ export async function POST(req: NextRequest) {
         throw new Error('Insurance plan not found');
       }
       insurancePlanRecord = plan;
+      
+      // Get doctor-insurance relationship to check for free exam override
+      const [doctorInsurance] = await db
+        .select()
+        .from(doctorInsurances)
+        .where(and(
+          eq(doctorInsurances.doctorId, doctorId),
+          eq(doctorInsurances.insurancePlanId, plan.id)
+        ))
+        .limit(1);
+      
+      doctorInsuranceRecord = doctorInsurance;
     }
 
     const isOD = doctorRecord.degree === 'OD';
@@ -122,7 +136,17 @@ export async function POST(req: NextRequest) {
       const amount = Math.max(eyeCodeAmount, emCodeAmount);
       rationale = `Standard billing - highest-paying code for ${insurancePlan} ($${amount.toFixed(2)})`;
       
-      const hasFreeExam = insurancePlanRecord?.coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
+      // Check for free exam coverage - first check doctor-specific override, then fall back to insurance default
+      let coversFreeExam = false;
+      if (doctorInsuranceRecord?.coversFreeExam !== null && doctorInsuranceRecord?.coversFreeExam !== undefined) {
+        // Use doctor-specific override
+        coversFreeExam = doctorInsuranceRecord.coversFreeExam;
+      } else if (insurancePlanRecord) {
+        // Use insurance plan default
+        coversFreeExam = insurancePlanRecord.coversFreeExam;
+      }
+      
+      const hasFreeExam = coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
         diagnosisCode = "Z01.00"
