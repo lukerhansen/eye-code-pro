@@ -104,11 +104,21 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 const signUpSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  inviteId: z.string().optional()
+  inviteId: z.string().optional(),
+  acceptTos: z.string().optional()
 });
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
-  const { email, password, inviteId } = data;
+  const { email, password, inviteId, acceptTos } = data;
+
+  // Check if TOS was accepted (the checkbox sends "on" when checked)
+  if (!acceptTos || acceptTos !== 'on') {
+    return {
+      error: 'You must accept the Terms of Service to create an account.',
+      email,
+      password
+    };
+  }
 
   const existingUser = await db
     .select()
@@ -182,7 +192,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   } else {
     // Create a new team if there's no invitation
     const newTeam: NewTeam = {
-      name: `${email}'s Team`,
+      name: null,
       doctorLimit: 0
     };
 
@@ -221,7 +231,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     return createCheckoutSession({ team: createdTeam, priceId, quantity });
   }
 
-  redirect('/dashboard');
+  redirect('/onboarding');
 });
 
 export async function signOut() {
@@ -492,5 +502,42 @@ export const updateTeamState = validatedActionWithUser(
     );
 
     return { success: 'Practice state updated successfully' };
+  }
+);
+
+const updateTeamNameSchema = z.object({
+  name: z.string().max(100).optional()
+});
+
+export const updateTeamName = validatedActionWithUser(
+  updateTeamNameSchema,
+  async (data, _, user) => {
+    const { name } = data;
+    const userWithTeam = await getUserWithTeam(user.id);
+
+    if (!userWithTeam?.teamId) {
+      return { error: 'User is not part of a team' };
+    }
+
+    // Only team owners can update team settings
+    if (user.role !== 'owner') {
+      return { error: 'Only practice owners can update practice settings' };
+    }
+
+    await db
+      .update(teams)
+      .set({ 
+        name: name || null,
+        updatedAt: new Date()
+      })
+      .where(eq(teams.id, userWithTeam.teamId));
+
+    await logActivity(
+      userWithTeam.teamId,
+      user.id,
+      ActivityType.UPDATE_TEAM_SETTINGS
+    );
+
+    return { success: 'Practice name updated successfully' };
   }
 );

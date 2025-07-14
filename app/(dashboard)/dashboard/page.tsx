@@ -12,14 +12,14 @@ import {
 import { customerPortalAction } from '@/lib/payments/actions';
 import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember, updateTeamState } from '@/app/(login)/actions';
+import { removeTeamMember, inviteTeamMember, updateTeamState, updateTeamName } from '@/app/(login)/actions';
 import useSWR from 'swr';
 import { Suspense, startTransition, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, PlusCircle, MapPin } from 'lucide-react';
+import { Loader2, PlusCircle, MapPin, Building2 } from 'lucide-react';
 
 type ActionState = {
   error?: string;
@@ -265,6 +265,92 @@ function PracticeInformation() {
   );
 }
 
+function PracticeNameSkeleton() {
+  return (
+    <Card className="mb-8 h-[140px]">
+      <CardHeader>
+        <CardTitle>Practice Details</CardTitle>
+      </CardHeader>
+    </Card>
+  );
+}
+
+function PracticeName() {
+  const { data: teamData, mutate } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const isOwner = user?.role === 'owner';
+  const [updateState, updateAction, isUpdatePending] = useActionState<
+    ActionState,
+    FormData
+  >(updateTeamName, {});
+
+  // Revalidate when the action completes
+  useEffect(() => {
+    if (!isUpdatePending && updateState.success) {
+      mutate();
+    }
+  }, [isUpdatePending, updateState.success, mutate]);
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Building2 className="h-5 w-5" />
+          Practice Details
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form action={(formData) => startTransition(() => updateAction(formData))} className="space-y-4">
+          <div>
+            <Label htmlFor="name" className="text-sm font-medium">
+              Practice Name
+            </Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Add a name for your practice (optional)
+            </p>
+            <div className="flex gap-2">
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Enter practice name"
+                defaultValue={teamData?.name || ''}
+                disabled={!isOwner}
+                className="flex-1"
+              />
+              <Button
+                type="submit"
+                disabled={!isOwner || isUpdatePending}
+                variant="outline"
+              >
+                {isUpdatePending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
+              </Button>
+            </div>
+          </div>
+          {updateState?.error && (
+            <p className="text-red-500 text-sm">{updateState.error}</p>
+          )}
+          {updateState?.success && (
+            <p className="text-green-500 text-sm">{updateState.success}</p>
+          )}
+          {!isOwner && (
+            <p className="text-sm text-muted-foreground">
+              Only practice owners can update practice details.
+            </p>
+          )}
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
 function TeamMembersSkeleton() {
   return (
     <Card className="mb-8 h-[300px]">
@@ -448,6 +534,9 @@ export default function SettingsPage() {
       <h1 className="text-lg lg:text-2xl font-medium mb-6">Practice Management</h1>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
+      </Suspense>
+      <Suspense fallback={<PracticeNameSkeleton />}>
+        <PracticeName />
       </Suspense>
       <Suspense fallback={<PracticeInformationSkeleton />}>
         <PracticeInformation />

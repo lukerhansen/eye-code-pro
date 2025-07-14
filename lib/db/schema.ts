@@ -23,7 +23,7 @@ export const users = pgTable('users', {
 
 export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 100 }).notNull(),
+  name: varchar('name', { length: 100 }),
   state: varchar('state', { length: 2 }), // US state abbreviation (e.g., 'CA', 'NY', 'TX')
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

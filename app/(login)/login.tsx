@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CircleIcon, Loader2 } from 'lucide-react';
 import { signIn, signUp } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
@@ -89,6 +90,31 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               />
             </div>
           </div>
+
+          {mode === 'signup' && (
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <Checkbox
+                  id="acceptTos"
+                  name="acceptTos"
+                  required
+                  className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <Label htmlFor="acceptTos" className="font-normal text-gray-700">
+                  I agree to the{' '}
+                  <Link
+                    href="/terms-of-service"
+                    target="_blank"
+                    className="text-teal-600 hover:text-teal-500 underline"
+                  >
+                    Terms of Service
+                  </Link>
+                </Label>
+              </div>
+            </div>
+          )}
 
           {state?.error && (
             <div className="text-red-500 text-sm">{state.error}</div>
