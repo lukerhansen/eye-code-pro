@@ -12,12 +12,6 @@ import {
 } from '@/lib/insurance-data';
 import { getDynamicReimbursement } from '@/lib/insurance-utils';
 
-const DIAGNOSIS_CODE_MAP: Record<string, string> = {
-  "Routine eye exam (myopia, hyperopia, astigmatism, presbyopia)": "H52.13",  
-  "Medical diagnosis": "Z01.00",
-};
-
-
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
@@ -85,12 +79,21 @@ export async function POST(req: NextRequest) {
     let diagnosisCode: string | null = null;
 
     if (isOD && isMedicaid) {
-      // OD on Medicaid always uses eye code (92)
+      // OD on Medicaid prefers eye code (92) but falls back to E&M if no eye code exists
       const actualLevel = level === 5 ? 4 : level;
-      const [eyeCode] = getCodePair(patientType, actualLevel);
-      recommendedCode = eyeCode;
+      const [eyeCode, emCode] = getCodePair(patientType, actualLevel);
+      
+      // Use eye code if available, otherwise use E&M code
+      recommendedCode = eyeCode || emCode;
+      
       const amount = await getDynamicReimbursement(doctorId, 'Medicaid', recommendedCode!, team.state, otherSelectedAsInsurance);
-      rationale = `OD on Medicaid - always use eye code (92) ($${amount.toFixed(2)})`;
+      
+      if (eyeCode) {
+        rationale = `OD on Medicaid - always use eye code (92) ($${amount.toFixed(2)})`;
+      } else {
+        rationale = `OD on Medicaid - using E&M code as no eye code available ($${amount.toFixed(2)})`;
+      }
+      
       if (level === 5) {
         rationale += ` - level ${level} bumped down to level ${actualLevel}`;
       }
@@ -105,8 +108,12 @@ export async function POST(req: NextRequest) {
       const eyeCodeAmount = eyeCode ? await getDynamicReimbursement(doctorId, insurancePlan, eyeCode, team.state, otherSelectedAsInsurance) : 0;
       const emCodeAmount = emCode ? await getDynamicReimbursement(doctorId, insurancePlan, emCode, team.state, otherSelectedAsInsurance) : 0;
       
-      // Determine which code pays more
-      if (eyeCodeAmount >= emCodeAmount) {
+      // Determine which code to use - if one is null, use the other one
+      if (!eyeCode && emCode) {
+        recommendedCode = emCode;
+      } else if (eyeCode && !emCode) {
+        recommendedCode = eyeCode;
+      } else if (eyeCodeAmount >= emCodeAmount) {
         recommendedCode = eyeCode;
       } else {
         recommendedCode = emCode;
@@ -119,7 +126,7 @@ export async function POST(req: NextRequest) {
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
         diagnosisCode = "Z01.00"
-        //TDOO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
+        //TODO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
       
       // Add debugging information
