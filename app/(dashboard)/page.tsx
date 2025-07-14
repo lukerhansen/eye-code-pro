@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowRight, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, TrendingUp, GraduationCap, Zap } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
@@ -39,7 +39,7 @@ export default function HomePage() {
               </h1>
               
               <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-                Point-of-care intelligence that instantly selects the highest-value compliant code 
+                Point-of-care intelligence that instantly selects the highest-value CPT code 
                 for every patient visit. Built on each payer's specific rules.
               </p>
               
@@ -63,15 +63,15 @@ export default function HomePage() {
                   <div className="space-y-6">
                     <div className="text-center">
                       <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
-                        92 vs 99
+                        E&M VS Eye Code
                       </div>
                       <p className="mt-2 text-gray-600">Auto-ranked by fee schedule</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
                       <div className="text-center">
-                        <div className="text-3xl font-semibold text-gray-900">3%</div>
-                        <p className="text-sm text-gray-600 mt-1">Revenue lift</p>
+                        <div className="text-3xl font-semibold text-gray-900">5%</div>
+                        <p className="text-sm text-gray-600 mt-1">Exam revenue lift</p>
                       </div>
                       <div className="text-center">
                         <div className="text-3xl font-semibold text-gray-900">2min</div>
@@ -118,14 +118,13 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
               <div className="relative bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 hover:border-teal-200 transition-all duration-300">
                 <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-600 mb-6">
-                  <ShieldCheck className="h-6 w-6" />
+                  <GraduationCap className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">
-                  Bulletproof compliance
+                  No expertise needed
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Bakes each plan's unique rules into the engine—free exam limits, 
-                  provider restrictions, emergency exceptions.
+                  Anyone on the team can pick the right code—zero CPT® memorization required.
                 </p>
               </div>
             </div>
@@ -158,7 +157,7 @@ export default function HomePage() {
               Start capturing revenue you're leaving on the table
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              Join practices achieving 3% average revenue lift with zero additional effort
+              Join practices achieving 5% average revenue lift with zero additional effort
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/sign-up">
@@ -175,7 +174,7 @@ export default function HomePage() {
               Setup in 5 minutes • Cancel anytime
             </p>
             <p className="mt-4 text-xs text-gray-400">
-              © {new Date().getFullYear()} CodeSelect. All rights reserved.
+              © {new Date().getFullYear()} EyeCodePro. All rights reserved.
             </p>
           </div>
         </div>

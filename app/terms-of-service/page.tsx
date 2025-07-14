@@ -16,7 +16,7 @@ export default function TermsOfServicePage() {
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
                 By accessing or using the website, application, widgets, plug‑ins or any related services (collectively, the
-                <strong>“Service”</strong>) provided by <strong>Eye‑Code Solutions, Inc.</strong> ("<strong>Company</strong>", “we,” “our,” or “us”), you (<strong>“you” or “User”</strong>) acknowledge that you have read, understood, and agree to be bound by these Terms of Service (<strong>“Terms”</strong>), as well as our <a href="/privacy" className="text-blue-600 underline">Privacy&nbsp;Policy</a>. If you do not agree to these Terms, you must not access or use the Service.
+                <strong>“Service”</strong>) provided by <strong>Eye‑Code Solutions, Inc.</strong> ("<strong>Company</strong>", “we,” “our,” or “us”), you (<strong>“you” or “User”</strong>) acknowledge that you have read, understood, and agree to be bound by these Terms of Service (<strong>“Terms”</strong>). If you do not agree to these Terms, you must not access or use the Service.
               </p>
 
               {/* 2. Definitions */}
@@ -120,7 +120,7 @@ export default function TermsOfServicePage() {
               {/* 18. Entire Agreement */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">18. Entire Agreement</h2>
               <p className="text-gray-700 mb-4">
-                These Terms, together with the Privacy Policy and any additional agreements expressly incorporated by reference, constitute the entire agreement between you and Company regarding the Service and supersede all prior or contemporaneous communications.
+                These Terms and any additional agreements expressly incorporated by reference, constitute the entire agreement between you and Company regarding the Service and supersede all prior or contemporaneous communications.
               </p>
 
               {/* 19. Contact Information */}

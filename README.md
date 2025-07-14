@@ -1,6 +1,6 @@
-# CodeSelect - Eye Care Insurance Code Platform
+# EyeCodePro - Eye Care Insurance Code Platform
 
-**CodeSelect** is a sophisticated platform designed specifically for ophthalmologists and optometrists to streamline insurance code selection, reduce claim denials, and maximize practice revenue through AI-powered coding assistance.
+**EyeCodePro** is a sophisticated platform designed specifically for ophthalmologists and optometrists to streamline insurance code selection, reduce claim denials, and maximize practice revenue through AI-powered coding assistance.
 
 **Demo: [https://codeselect.vercel.app/](https://codeselect.vercel.app/)**
 
