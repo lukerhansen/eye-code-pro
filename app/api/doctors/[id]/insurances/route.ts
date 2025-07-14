@@ -9,7 +9,7 @@ import {
   type NewCustomFeeSchedule 
 } from '@/lib/db/schema';
 import { getUser, getTeamForUser } from '@/lib/db/queries';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or, isNull } from 'drizzle-orm';
 
 export async function GET(
   req: NextRequest,
@@ -40,8 +40,17 @@ export async function GET(
       return NextResponse.json({ error: 'Doctor not found' }, { status: 404 });
     }
 
-    // Get all insurance plans
-    const allInsurancePlans = await db.select().from(insurancePlans).orderBy(insurancePlans.name);
+    // Get all insurance plans - both global and team-specific custom ones
+    const allInsurancePlans = await db
+      .select()
+      .from(insurancePlans)
+      .where(
+        or(
+          isNull(insurancePlans.teamId), // Global insurances
+          eq(insurancePlans.teamId, team.id) // Team's custom insurances
+        )
+      )
+      .orderBy(insurancePlans.name);
 
     // Get doctor's insurance acceptances with custom fee schedules
     const doctorInsurancesList = await db

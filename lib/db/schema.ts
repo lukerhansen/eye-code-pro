@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   boolean,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -94,6 +95,7 @@ export const teamsRelations = relations(teams, ({ many }) => ({
   activityLogs: many(activityLogs),
   invitations: many(invitations),
   doctors: many(doctors),
+  customInsurancePlans: many(insurancePlans),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -174,9 +176,15 @@ export const doctors = pgTable('doctors', {
 // Insurance plans master list
 export const insurancePlans = pgTable('insurance_plans', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 100 }).notNull().unique(),
+  name: varchar('name', { length: 100 }).notNull(),
   coversFreeExam: boolean('covers_free_exam').notNull().default(false),
+  teamId: integer('team_id').references(() => teams.id, { onDelete: 'cascade' }), // null for global insurances
+  isCustom: boolean('is_custom').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (table) => {
+  return {
+    nameTeamIdUnique: unique().on(table.name, table.teamId),
+  };
 });
 
 // Doctor insurance acceptance
@@ -228,7 +236,11 @@ export const doctorsRelations = relations(doctors, ({ one, many }) => ({
   doctorInsurances: many(doctorInsurances),
 }));
 
-export const insurancePlansRelations = relations(insurancePlans, ({ many }) => ({
+export const insurancePlansRelations = relations(insurancePlans, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [insurancePlans.teamId],
+    references: [teams.id],
+  }),
   doctorInsurances: many(doctorInsurances),
   defaultFeeSchedules: many(defaultFeeSchedules),
 }));

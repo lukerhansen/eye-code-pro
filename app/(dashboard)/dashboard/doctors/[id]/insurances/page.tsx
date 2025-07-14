@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Save, DollarSign } from 'lucide-react';
+import { ArrowLeft, Save, DollarSign, Plus, Edit2, Trash2 } from 'lucide-react';
 import type { Doctor, InsurancePlan } from '@/lib/db/schema';
 
 interface InsuranceAcceptance {
@@ -58,6 +58,11 @@ export default function DoctorInsurancesPage() {
   const [feeScheduleDialogOpen, setFeeScheduleDialogOpen] = useState(false);
   const [defaultFees, setDefaultFees] = useState<FeeSchedule[]>([]);
   const [customFees, setCustomFees] = useState<Record<string, string>>({});
+  const [customInsuranceDialogOpen, setCustomInsuranceDialogOpen] = useState(false);
+  const [newInsuranceName, setNewInsuranceName] = useState('');
+  const [newInsuranceCoversFreeExam, setNewInsuranceCoversFreeExam] = useState(false);
+  const [editingCustomInsurance, setEditingCustomInsurance] = useState<InsurancePlan | null>(null);
+  const [savingCustomInsurance, setSavingCustomInsurance] = useState(false);
 
   useEffect(() => {
     fetchDoctorAndInsurances();
@@ -214,6 +219,100 @@ export default function DoctorInsurancesPage() {
     }
   };
 
+  const handleCreateCustomInsurance = async () => {
+    if (!newInsuranceName.trim()) return;
+    
+    setSavingCustomInsurance(true);
+    try {
+      const response = await fetch('/api/insurances/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newInsuranceName.trim(),
+          coversFreeExam: newInsuranceCoversFreeExam,
+        }),
+      });
+
+      if (response.ok) {
+        // Refresh the insurance list
+        await fetchDoctorAndInsurances();
+        setCustomInsuranceDialogOpen(false);
+        setNewInsuranceName('');
+        setNewInsuranceCoversFreeExam(false);
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to create custom insurance');
+      }
+    } catch (error) {
+      console.error('Error creating custom insurance:', error);
+      alert('Failed to create custom insurance');
+    } finally {
+      setSavingCustomInsurance(false);
+    }
+  };
+
+  const handleUpdateCustomInsurance = async () => {
+    if (!editingCustomInsurance || !newInsuranceName.trim()) return;
+    
+    setSavingCustomInsurance(true);
+    try {
+      const response = await fetch('/api/insurances/custom', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingCustomInsurance.id,
+          name: newInsuranceName.trim(),
+          coversFreeExam: newInsuranceCoversFreeExam,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchDoctorAndInsurances();
+        setEditingCustomInsurance(null);
+        setCustomInsuranceDialogOpen(false);
+        setNewInsuranceName('');
+        setNewInsuranceCoversFreeExam(false);
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to update custom insurance');
+      }
+    } catch (error) {
+      console.error('Error updating custom insurance:', error);
+      alert('Failed to update custom insurance');
+    } finally {
+      setSavingCustomInsurance(false);
+    }
+  };
+
+  const handleDeleteCustomInsurance = async (insuranceId: number) => {
+    if (!confirm('Are you sure you want to delete this custom insurance? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/insurances/custom?id=${insuranceId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        await fetchDoctorAndInsurances();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete custom insurance');
+      }
+    } catch (error) {
+      console.error('Error deleting custom insurance:', error);
+      alert('Failed to delete custom insurance');
+    }
+  };
+
+  const openEditCustomInsurance = (insurance: InsurancePlan) => {
+    setEditingCustomInsurance(insurance);
+    setNewInsuranceName(insurance.name);
+    setNewInsuranceCoversFreeExam(insurance.coversFreeExam);
+    setCustomInsuranceDialogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -250,6 +349,20 @@ export default function DoctorInsurancesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 flex justify-end">
+            <Button
+              onClick={() => {
+                setEditingCustomInsurance(null);
+                setNewInsuranceName('');
+                setNewInsuranceCoversFreeExam(false);
+                setCustomInsuranceDialogOpen(true);
+              }}
+              size="sm"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Custom Insurance
+            </Button>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -273,7 +386,12 @@ export default function DoctorInsurancesPage() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">
-                    {acceptance.insurancePlan.name}
+                    <div className="flex items-center gap-2">
+                      {acceptance.insurancePlan.name}
+                      {acceptance.insurancePlan.isCustom && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Custom</span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {acceptance.insurancePlan.coversFreeExam ? 'Yes' : 'No'}
@@ -286,16 +404,36 @@ export default function DoctorInsurancesPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    {acceptance.isAccepted && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openFeeScheduleDialog(acceptance)}
-                      >
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Configure Fees
-                      </Button>
-                    )}
+                    <div className="flex items-center justify-end gap-2">
+                      {acceptance.isAccepted && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openFeeScheduleDialog(acceptance)}
+                        >
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          Configure Fees
+                        </Button>
+                      )}
+                      {acceptance.insurancePlan.isCustom && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditCustomInsurance(acceptance.insurancePlan)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteCustomInsurance(acceptance.insurancePlan.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -360,6 +498,64 @@ export default function DoctorInsurancesPage() {
             >
               <Save className="mr-2 h-4 w-4" />
               Save Custom Rates
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Custom Insurance Dialog */}
+      <Dialog open={customInsuranceDialogOpen} onOpenChange={setCustomInsuranceDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingCustomInsurance ? 'Edit Custom Insurance' : 'Add Custom Insurance'}
+            </DialogTitle>
+            <DialogDescription>
+              Create a custom insurance plan for your organization
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="insurance-name">Insurance Name</Label>
+              <Input
+                id="insurance-name"
+                value={newInsuranceName}
+                onChange={(e) => setNewInsuranceName(e.target.value)}
+                placeholder="Enter insurance name"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="covers-free-exam"
+                checked={newInsuranceCoversFreeExam}
+                onCheckedChange={(checked) => setNewInsuranceCoversFreeExam(checked as boolean)}
+              />
+              <Label htmlFor="covers-free-exam" className="font-normal">
+                Covers free exam
+              </Label>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCustomInsuranceDialogOpen(false);
+                setEditingCustomInsurance(null);
+                setNewInsuranceName('');
+                setNewInsuranceCoversFreeExam(false);
+              }}
+              disabled={savingCustomInsurance}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={editingCustomInsurance ? handleUpdateCustomInsurance : handleCreateCustomInsurance}
+              disabled={savingCustomInsurance || !newInsuranceName.trim()}
+            >
+              {savingCustomInsurance ? 'Saving...' : (editingCustomInsurance ? 'Update' : 'Create')}
             </Button>
           </DialogFooter>
         </DialogContent>

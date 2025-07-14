@@ -43,6 +43,20 @@ export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99215': 127.67,
     '99205': 184.46,
   },
+  'default_private_insurance': {
+    '92002': 75.21,
+    '92004': 137.27,
+    '92012': 68.81,
+    '92014': 101.88,
+    '99202': 68.99,
+    '99203': 102.58,
+    '99204': 145.40,
+    '99212': 40.72,
+    '99213': 55.77,
+    '99214': 87.55,
+    '99215': 127.67,
+    '99205': 184.46,
+  },
 };
 
 // Insurance plans and whether they cover full exams
@@ -60,7 +74,6 @@ export const INSURANCE_PLANS: Record<string, boolean> = {
   BCBS: false,
   PEHP: true,
   SelectHealth: true,
-  Other: false,
 };
 
 // Available doctors and their types
