@@ -37,11 +37,11 @@ export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99202': 68.99,
     '99203': 102.58,
     '99204': 145.40,
+    '99205': 266.01,
     '99212': 40.72,
     '99213': 55.77,
     '99214': 87.55,
-    '99215': 127.67,
-    '99205': 184.46,
+    '99215': 190.01,
   },
   'default_private_insurance': {
     '92002': 75.21,
@@ -51,11 +51,11 @@ export const CODE_REIMBURSEMENT: Record<string, Record<string, number>> = {
     '99202': 68.99,
     '99203': 102.58,
     '99204': 145.40,
+    '99205': 266.01,
     '99212': 40.72,
     '99213': 55.77,
     '99214': 87.55,
-    '99215': 127.67,
-    '99205': 184.46,
+    '99215': 190.01,
   },
 };
 
@@ -92,13 +92,13 @@ export const DIAGNOSIS_ELIGIBILITY: Record<string, boolean> = {
 // Code pairs for different patient types and levels
 export const CODES: Record<string, Record<number, [string | null, string | null]>> = {
   new: {
-    2: ['92002', '99202'],  
+    2: ['92002', '99202'],
     3: ['92004', '99203'],
     4: ['92004', '99204'],
     5: [null, '99205'],
   },
   established: {
-    2: [null, '99212'],  
+    2: [null, '99212'],
     3: ['92012', '99213'],
     4: ['92014', '99214'],
     5: [null, '99215'],
@@ -112,12 +112,12 @@ export function coversFullExam(insurancePlan: string): boolean {
 
 export function getReimbursement(insurancePlan: string, code: string | null | undefined): number {
   if (!code) return 0;
-  
+
   // Check if the insurance plan exists in CODE_REIMBURSEMENT
   if (CODE_REIMBURSEMENT[insurancePlan]?.[code]) {
     return CODE_REIMBURSEMENT[insurancePlan][code];
   }
-  
+
   // If insurance plan not found, use Medicare as default
   return CODE_REIMBURSEMENT.Medicare?.[code] ?? 0;
 }
@@ -149,10 +149,10 @@ export function higherPayingCodeWithDebug(code1: string | null, code2: string | 
   if (!code1 && !code2) {
     return { winningCode: null, comparison: null };
   }
-  
+
   if (!code1) {
-    return { 
-      winningCode: code2, 
+    return {
+      winningCode: code2,
       comparison: {
         code1: null,
         code1Price: 0,
@@ -162,10 +162,10 @@ export function higherPayingCodeWithDebug(code1: string | null, code2: string | 
       }
     };
   }
-  
+
   if (!code2) {
-    return { 
-      winningCode: code1, 
+    return {
+      winningCode: code1,
       comparison: {
         code1: code1,
         code1Price: getReimbursement(insurancePlan, code1),
@@ -175,11 +175,11 @@ export function higherPayingCodeWithDebug(code1: string | null, code2: string | 
       }
     };
   }
-  
+
   const code1Price = getReimbursement(insurancePlan, code1);
   const code2Price = getReimbursement(insurancePlan, code2);
   const winningCode = code1Price >= code2Price ? code1 : code2;
-  
+
   return {
     winningCode,
     comparison: {
