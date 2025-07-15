@@ -117,7 +117,7 @@ export default function CodePickerPage() {
       return;
     }
 
-    setOutput("Calculating…");
+    setOutput("Optimizing...");
     try {
       // Check if "Other" option is selected
       const isOtherMedicareMedicaid = (selectedInsurance as any)?.value === "other-medicare-medicaid";
@@ -162,7 +162,7 @@ export default function CodePickerPage() {
         return;
       }
 
-      const codeDisplay = diagnosisCode ? `${recommendedCode} – ${diagnosisCode}` : recommendedCode;
+      const codeDisplay = diagnosisCode ? `${recommendedCode} ${diagnosisCode}` : recommendedCode;
       setOutput(codeDisplay);
     } catch (err: any) {
       setOutput(`Error: ${err.message}`);
@@ -274,7 +274,7 @@ export default function CodePickerPage() {
                     Other (Medicare/Medicaid)
                   </SelectItem>
                   <SelectItem key="other-private" value="other-private">
-                    Other (Private)
+                    Other (Commercial)
                   </SelectItem>
                 </>
               )}
@@ -292,7 +292,7 @@ export default function CodePickerPage() {
               checked={freeExamBilled}
               onChange={(e) => setFreeExamBilled(e.target.checked)}
             />
-            A free exam has already been billed in the last 12 months
+            An annual preventative exam has already been billed in the last 12 months
           </label>
         </div>
       )}

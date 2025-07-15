@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       const hasFreeExam = coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
-        diagnosisCode = "Z01.00"
+        diagnosisCode = "(Diagnosis code: Z01.00)"
         //TODO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
       

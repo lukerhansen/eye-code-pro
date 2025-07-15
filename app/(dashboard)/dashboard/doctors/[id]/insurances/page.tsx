@@ -186,7 +186,7 @@ export default function DoctorInsurancesPage() {
             ? { ...ia, coversFreeExam: acceptance.coversFreeExam }
             : ia
         ));
-        console.error('Error updating free exam override');
+        console.error('Error updating An annual preventative exam override');
       }
     } catch (error) {
       // Revert on failure
@@ -195,7 +195,7 @@ export default function DoctorInsurancesPage() {
           ? { ...ia, coversFreeExam: acceptance.coversFreeExam }
           : ia
       ));
-      console.error('Error updating free exam override:', error);
+      console.error('Error updating An annual preventative exam override:', error);
     } finally {
       setSavingStates(prev => ({ ...prev, [planId]: false }));
     }
@@ -396,7 +396,7 @@ export default function DoctorInsurancesPage() {
               <TableRow>
                 <TableHead className="w-12">Accept</TableHead>
                 <TableHead>Insurance Plan</TableHead>
-                <TableHead>Free Exam Coverage</TableHead>
+                <TableHead>Annual preventative exam Coverage</TableHead>
                 <TableHead>Fee Schedule</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -571,7 +571,7 @@ export default function DoctorInsurancesPage() {
                 onCheckedChange={(checked) => setNewInsuranceCoversFreeExam(checked as boolean)}
               />
               <Label htmlFor="covers-free-exam" className="font-normal">
-                Covers free exam
+                Covers annual preventative exam
               </Label>
             </div>
           </div>
