@@ -139,8 +139,7 @@ export default function HomePage() {
                   Point-of-care speed
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Staff answers simple questions. System returns the optimal code 
-                  with rationale. No tables, no guesswork.
+                  Staff answers simple questions. System returns the optimal code. No tables, no guesswork.
                 </p>
               </div>
             </div>

@@ -97,7 +97,7 @@ export function PricingCard({
                 ✓ Instant setup • ✓ Cancel anytime
               </p>
               <p className="text-xs text-gray-500">
-                Average ROI: 3% revenue increase
+                Average ROI: 5% exam revenue increase
               </p>
             </div>
           </div>
