@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Flag } from "lucide-react";
+import { Flag, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -38,6 +38,7 @@ export default function CodePickerPage() {
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [usage, setUsage] = useState<{ current: number; limit: number; displayed: number } | null>(null);
+  const [isAdditionalInfoExpanded, setIsAdditionalInfoExpanded] = useState(false);
 
   // Derived visibility states
   const coversFreeExam = selectedInsurance?.coversFreeExam || false;
@@ -120,6 +121,7 @@ export default function CodePickerPage() {
 
     setOutput("Optimizing...");
     setDiagnosisCode(null);
+    setIsAdditionalInfoExpanded(false);
     try {
       // Check if "Other" option is selected
       const isOtherMedicareMedicaid = (selectedInsurance as any)?.value === "other-medicare-medicaid";
@@ -390,33 +392,45 @@ export default function CodePickerPage() {
         </div>
       )}
 
-      {/* Debug Information */}
+      {/* Additional Information */}
       {debugInfo?.codeComparison && (
-        <div className="mt-4 p-4 bg-gray-100 rounded-lg border">
-          <h3 className="text-lg font-semibold mb-2">Code Comparison (Debug Info)</h3>
-          <div className="space-y-2 text-sm">
-            <div className="font-medium">Insurance Plan: {debugInfo.codeComparison.insurancePlan}</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="border-r pr-4">
-                <div className="font-medium">Eye Code (92xxx)</div>
-                <div>Code: {debugInfo.codeComparison.code1 || 'N/A'}</div>
-                <div>Price: ${debugInfo.codeComparison.code1Price.toFixed(2)}</div>
+        <div className="mt-4 bg-gray-100 rounded-lg border">
+          <button
+            onClick={() => setIsAdditionalInfoExpanded(!isAdditionalInfoExpanded)}
+            className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-200 transition-colors rounded-lg"
+          >
+            <h3 className="text-lg font-semibold">Additional Info</h3>
+            {isAdditionalInfoExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-600" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-600" />
+            )}
+          </button>
+          {isAdditionalInfoExpanded && (
+            <div className="px-4 pb-4 space-y-2 text-sm">
+              <div className="font-medium">Insurance Plan: {debugInfo.codeComparison.insurancePlan}</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border-r pr-4">
+                  <div className="font-medium">Eye Code (92xxx)</div>
+                  <div>Code: {debugInfo.codeComparison.code1 || 'N/A'}</div>
+                  <div>Price: ${debugInfo.codeComparison.code1Price.toFixed(2)}</div>
+                </div>
+                <div className="pl-4">
+                  <div className="font-medium">E&M Code (99xxx)</div>
+                  <div>Code: {debugInfo.codeComparison.code2 || 'N/A'}</div>
+                  <div>Price: ${debugInfo.codeComparison.code2Price.toFixed(2)}</div>
+                </div>
               </div>
-              <div className="pl-4">
-                <div className="font-medium">E&M Code (99xxx)</div>
-                <div>Code: {debugInfo.codeComparison.code2 || 'N/A'}</div>
-                <div>Price: ${debugInfo.codeComparison.code2Price.toFixed(2)}</div>
+              <div className="mt-3 pt-2 border-t">
+                <div className="font-medium text-teal-600">
+                  Winner: {debugInfo.codeComparison.code1Price >= debugInfo.codeComparison.code2Price ? 
+                    `${debugInfo.codeComparison.code1} ($${debugInfo.codeComparison.code1Price.toFixed(2)})` : 
+                    `${debugInfo.codeComparison.code2} ($${debugInfo.codeComparison.code2Price.toFixed(2)})`
+                  }
+                </div>
               </div>
             </div>
-            <div className="mt-3 pt-2 border-t">
-              <div className="font-medium text-teal-600">
-                Winner: {debugInfo.codeComparison.code1Price >= debugInfo.codeComparison.code2Price ? 
-                  `${debugInfo.codeComparison.code1} ($${debugInfo.codeComparison.code1Price.toFixed(2)})` : 
-                  `${debugInfo.codeComparison.code2} ($${debugInfo.codeComparison.code2Price.toFixed(2)})`
-                }
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
