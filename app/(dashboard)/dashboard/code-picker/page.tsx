@@ -32,6 +32,7 @@ export default function CodePickerPage() {
   const [level, setLevel] = useState<number>(4);
   const [diagnosis, setDiagnosis] = useState<string>(DIAGNOSES[0]);
   const [output, setOutput] = useState<string>("");
+  const [diagnosisCodeDisplay, setDiagnosisCode] = useState<string | null>(null);
   const [billingEntryId, setBillingEntryId] = useState<number | null>(null);
   const [isFlagged, setIsFlagged] = useState<boolean>(false);
   const [debugInfo, setDebugInfo] = useState<any>(null);
@@ -118,6 +119,7 @@ export default function CodePickerPage() {
     }
 
     setOutput("Optimizing...");
+    setDiagnosisCode(null);
     try {
       // Check if "Other" option is selected
       const isOtherMedicareMedicaid = (selectedInsurance as any)?.value === "other-medicare-medicaid";
@@ -162,10 +164,11 @@ export default function CodePickerPage() {
         return;
       }
 
-      const codeDisplay = diagnosisCode ? `${recommendedCode} ${diagnosisCode}` : recommendedCode;
-      setOutput(codeDisplay);
+      setOutput(recommendedCode);
+      setDiagnosisCode(diagnosisCode);
     } catch (err: any) {
       setOutput(`Error: ${err.message}`);
+      setDiagnosisCode(null);
     }
   };
 
@@ -375,8 +378,15 @@ export default function CodePickerPage() {
 
       {/* Output */}
       {output && (
-        <div className="mt-4 text-4xl md:text-6xl font-extrabold text-teal-600 text-center">
-          {output}
+        <div className="mt-4 text-center">
+          <div className="text-4xl md:text-6xl font-extrabold text-teal-600">
+            {output}
+          </div>
+          {diagnosisCodeDisplay && (
+            <div className="mt-2 text-lg md:text-xl text-gray-600">
+              ({diagnosisCodeDisplay})
+            </div>
+          )}
         </div>
       )}
 

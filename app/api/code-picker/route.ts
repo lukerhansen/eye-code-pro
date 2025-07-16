@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
       }
       if (!DIAGNOSIS_ELIGIBILITY[diagnosis]) {
         rationale += ' - vision diagnosis (code: H52.13)';
-        diagnosisCode = "H52.13";
+        diagnosisCode = "Consider diagnosis code H52.13";
       }
     } else {
       const [eyeCode, emCode] = getCodePair(patientType, level);
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
       const hasFreeExam = coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
-        diagnosisCode = "(Diagnosis code: Z01.00)"
+        diagnosisCode = "Consider diagnosis code: Z01.01 or Z01.00";
         //TODO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
       
