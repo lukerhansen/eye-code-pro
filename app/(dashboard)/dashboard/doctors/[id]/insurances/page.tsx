@@ -15,6 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
   Table,
   TableBody,
@@ -23,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Save, DollarSign, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, DollarSign, Plus, MoreVertical } from 'lucide-react';
 import type { Doctor, InsurancePlan } from '@/lib/db/schema';
 
 interface InsuranceAcceptance {
@@ -320,12 +326,12 @@ export default function DoctorInsurancesPage() {
 
 
   const handleDeleteCustomInsurance = async (insuranceId: number) => {
-    if (!confirm('Are you sure you want to delete this custom insurance? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to remove this custom insurance from this doctor? This action cannot be undone.')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/insurances/custom?id=${insuranceId}`, {
+      const response = await fetch(`/api/doctors/${doctorId}/insurances?insurancePlanId=${insuranceId}`, {
         method: 'DELETE',
       });
 
@@ -333,11 +339,11 @@ export default function DoctorInsurancesPage() {
         await fetchDoctorAndInsurances();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to delete custom insurance');
+        alert(error.error || 'Failed to remove custom insurance');
       }
     } catch (error) {
-      console.error('Error deleting custom insurance:', error);
-      alert('Failed to delete custom insurance');
+      console.error('Error removing custom insurance:', error);
+      alert('Failed to remove custom insurance');
     }
   };
 
@@ -415,10 +421,9 @@ export default function DoctorInsurancesPage() {
                   </TableCell>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      {acceptance.insurancePlan.name}
-                      {acceptance.insurancePlan.isCustom && (
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Custom</span>
-                      )}
+                      <span className={acceptance.insurancePlan.isCustom ? 'text-blue-600' : ''}>
+                        {acceptance.insurancePlan.name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -434,8 +439,9 @@ export default function DoctorInsurancesPage() {
                         disabled={savingStates[acceptance.insurancePlan.id] || false}
                       >
                         <option value="default">Default ({acceptance.insurancePlan.coversFreeExam ? 'Yes' : 'No'})</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
+                        <option value={acceptance.insurancePlan.coversFreeExam ? 'no' : 'yes'}>
+                          {acceptance.insurancePlan.coversFreeExam ? 'No' : 'Yes'}
+                        </option>
                       </select>
                     ) : (
                       <span className="text-sm text-gray-400">
@@ -451,25 +457,41 @@ export default function DoctorInsurancesPage() {
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {acceptance.isAccepted && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openFeeScheduleDialog(acceptance)}
-                        >
-                          <DollarSign className="mr-2 h-4 w-4" />
-                          Configure Fees
-                        </Button>
-                      )}
-                      {acceptance.insurancePlan.isCustom && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteCustomInsurance(acceptance.insurancePlan.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      {acceptance.isAccepted ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openFeeScheduleDialog(acceptance)}
+                          >
+                            <DollarSign className="mr-2 h-4 w-4" />
+                            Configure Fees
+                          </Button>
+                          {acceptance.insurancePlan.isCustom && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-1 h-8 w-8"
+                                >
+                                  <MoreVertical className="h-4 w-4 text-gray-500" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="text-red-600 focus:text-red-600"
+                                  onClick={() => handleDeleteCustomInsurance(acceptance.insurancePlan.id)}
+                                >
+                                  Delete Insurance
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-[120px]"></div>
                       )}
                     </div>
                   </TableCell>
