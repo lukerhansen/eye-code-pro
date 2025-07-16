@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logBillingEntry, getUser, getTeamForUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
-import { 
-  doctors, 
+import {
+  doctors,
   insurancePlans,
   doctorInsurances
 } from '@/lib/db/schema';
@@ -65,12 +65,12 @@ export async function POST(req: NextRequest) {
         .from(insurancePlans)
         .where(eq(insurancePlans.name, insurancePlan))
         .limit(1);
-      
+
       if (!plan) {
         throw new Error('Insurance plan not found');
       }
       insurancePlanRecord = plan;
-      
+
       // Get doctor-insurance relationship to check for free exam override
       const [doctorInsurance] = await db
         .select()
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
           eq(doctorInsurances.insurancePlanId, plan.id)
         ))
         .limit(1);
-      
+
       doctorInsuranceRecord = doctorInsurance;
     }
 
@@ -93,35 +93,55 @@ export async function POST(req: NextRequest) {
     let diagnosisCode: string | null = null;
 
     if (isOD && isMedicaid) {
-      // OD on Medicaid prefers eye code (92) but falls back to E&M if no eye code exists
-      const actualLevel = level === 5 ? 4 : level;
-      const [eyeCode, emCode] = getCodePair(patientType, actualLevel);
-      
-      // Use eye code if available, otherwise use E&M code
-      recommendedCode = eyeCode || emCode;
-      
-      const amount = await getDynamicReimbursement(doctorId, 'Medicaid', recommendedCode!, team.state, otherSelectedAsInsurance);
-      
-      if (eyeCode) {
-        rationale = `OD on Medicaid - always use eye code (92) ($${amount.toFixed(2)})`;
-      } else {
-        rationale = `OD on Medicaid - using E&M code as no eye code available ($${amount.toFixed(2)})`;
-      }
-      
-      if (level === 5) {
-        rationale += ` - level ${level} bumped down to level ${actualLevel}`;
-      }
-      if (!DIAGNOSIS_ELIGIBILITY[diagnosis]) {
+      // OD on Medicaid - code selection based on visit type
+      // Check if it's a routine eye exam or medical visit
+      const isRoutineEyeExam = !DIAGNOSIS_ELIGIBILITY[diagnosis];
+
+      if (isRoutineEyeExam) {
+        const actualLevel = level === 5 ? 4 : level;
+        const [eyeCode, emCode] = getCodePair(patientType, actualLevel);
+        // Routine eye exam - always use eye code
+        recommendedCode = eyeCode || emCode;
+        const amount = await getDynamicReimbursement(doctorId, 'Medicaid', recommendedCode!, team.state, otherSelectedAsInsurance);
+
+        if (eyeCode) {
+          rationale = `OD on Medicaid - routine eye exam, using eye code (92) ($${amount.toFixed(2)})`;
+        } else {
+          rationale = `OD on Medicaid - routine eye exam, using E&M code as no eye code available ($${amount.toFixed(2)})`;
+        }
         rationale += ' - vision diagnosis (code: H52.13)';
-        diagnosisCode = "H52.13";
+        diagnosisCode = "Consider diagnosis code H52.13";
+        if (level === 5) {
+          rationale += ` - level ${level} bumped down to level ${level}`;
+        }
+      } else {
+        const [eyeCode, emCode] = getCodePair(patientType, level);
+        // Medical visit - use max of (eyeCode, emCode)
+        const eyeCodeAmount = eyeCode ? await getDynamicReimbursement(doctorId, 'Medicaid', eyeCode, team.state, otherSelectedAsInsurance) : 0;
+        const emCodeAmount = emCode ? await getDynamicReimbursement(doctorId, 'Medicaid', emCode, team.state, otherSelectedAsInsurance) : 0;
+
+        if (!eyeCode && emCode) {
+          recommendedCode = emCode;
+        } else if (eyeCode && !emCode) {
+          recommendedCode = eyeCode;
+        } else if (eyeCodeAmount >= emCodeAmount) {
+          recommendedCode = eyeCode;
+        } else {
+          recommendedCode = emCode;
+        }
+
+        const amount = Math.max(eyeCodeAmount, emCodeAmount);
+        rationale = `OD on Medicaid - medical visit, using highest-paying code ($${amount.toFixed(2)})`;
       }
+
+
     } else {
       const [eyeCode, emCode] = getCodePair(patientType, level);
-      
+
       // Get reimbursements for both codes
       const eyeCodeAmount = eyeCode ? await getDynamicReimbursement(doctorId, insurancePlan, eyeCode, team.state, otherSelectedAsInsurance) : 0;
       const emCodeAmount = emCode ? await getDynamicReimbursement(doctorId, insurancePlan, emCode, team.state, otherSelectedAsInsurance) : 0;
-      
+
       // Determine which code to use - if one is null, use the other one
       if (!eyeCode && emCode) {
         recommendedCode = emCode;
@@ -132,10 +152,10 @@ export async function POST(req: NextRequest) {
       } else {
         recommendedCode = emCode;
       }
-      
+
       const amount = Math.max(eyeCodeAmount, emCodeAmount);
       rationale = `Standard billing - highest-paying code for ${insurancePlan} ($${amount.toFixed(2)})`;
-      
+
       // Check for free exam coverage - first check doctor-specific override, then fall back to insurance default
       let coversFreeExam = false;
       if (doctorInsuranceRecord?.coversFreeExam !== null && doctorInsuranceRecord?.coversFreeExam !== undefined) {
@@ -145,14 +165,14 @@ export async function POST(req: NextRequest) {
         // Use insurance plan default
         coversFreeExam = insurancePlanRecord.coversFreeExam;
       }
-      
+
       const hasFreeExam = coversFreeExam && !freeExamBilledLastYear && !isEmergencyVisit;
       if (hasFreeExam) {
         rationale += ' - Preventative exam (Diagnostic code: Z01.00)';
-        diagnosisCode = "(Diagnosis code: Z01.00)"
+        diagnosisCode = "Consider diagnosis code: Z01.01 or Z01.00";
         //TODO assumption: maybe not all insurances that have free exams, bill this diagnosis code.
       }
-      
+
       // Add debugging information
       debugInfo = {
         codeComparison: {

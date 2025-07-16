@@ -553,9 +553,9 @@ export default function SettingsPage() {
         <Suspense fallback={<TeamMembersSkeleton />}>
           <TeamMembers />
         </Suspense>
-        <Suspense fallback={<InviteTeamMemberSkeleton />}>
+        {/* <Suspense fallback={<InviteTeamMemberSkeleton />}>
           <InviteTeamMember />
-        </Suspense>
+        </Suspense> */}
       </div>
     </section>
   );

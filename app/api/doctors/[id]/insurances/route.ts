@@ -5,6 +5,7 @@ import {
   insurancePlans,
   doctors,
   customFeeSchedules,
+  defaultFeeSchedules,
   type NewDoctorInsurance,
   type NewCustomFeeSchedule 
 } from '@/lib/db/schema';
@@ -206,6 +207,97 @@ export async function POST(
     console.error('Error updating doctor insurance:', error);
     return NextResponse.json(
       { error: 'Failed to update doctor insurance' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user has owner role
+    // if (user.accountRole !== 'owner') {
+    //   return NextResponse.json({ error: 'Only owners can delete custom insurances' }, { status: 403 });
+    // }
+
+    const team = await getTeamForUser();
+    if (!team) {
+      return NextResponse.json({ error: 'No team found' }, { status: 404 });
+    }
+
+    const resolvedParams = await params;
+    const doctorId = parseInt(resolvedParams.id);
+    
+    const { searchParams } = new URL(req.url);
+    const insurancePlanId = searchParams.get('insurancePlanId');
+    
+    if (!insurancePlanId || isNaN(Number(insurancePlanId))) {
+      return NextResponse.json(
+        { error: 'Valid insurance plan ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Verify doctor belongs to team
+    const [doctor] = await db
+      .select()
+      .from(doctors)
+      .where(and(eq(doctors.id, doctorId), eq(doctors.teamId, team.id)))
+      .limit(1);
+
+    if (!doctor) {
+      return NextResponse.json({ error: 'Doctor not found' }, { status: 404 });
+    }
+
+    // Verify the insurance plan is custom and belongs to this team
+    const [insurancePlan] = await db
+      .select()
+      .from(insurancePlans)
+      .where(and(
+        eq(insurancePlans.id, Number(insurancePlanId)),
+        eq(insurancePlans.teamId, team.id),
+        eq(insurancePlans.isCustom, true)
+      ))
+      .limit(1);
+
+    if (!insurancePlan) {
+      return NextResponse.json({ error: 'Custom insurance not found or does not belong to your team' }, { status: 404 });
+    }
+
+    // Delete in the correct order to avoid foreign key constraints:
+    
+    // 1. First delete from doctor_insurances (this will cascade delete custom_fee_schedules)
+    await db
+      .delete(doctorInsurances)
+      .where(and(
+        eq(doctorInsurances.doctorId, doctorId),
+        eq(doctorInsurances.insurancePlanId, Number(insurancePlanId))
+      ));
+
+    // 2. Delete from default_fee_schedules
+    await db
+      .delete(defaultFeeSchedules)
+      .where(eq(defaultFeeSchedules.insurancePlanId, Number(insurancePlanId)));
+
+    // 3. Finally delete the custom insurance plan from insurance_plans table
+    await db
+      .delete(insurancePlans)
+      .where(eq(insurancePlans.id, Number(insurancePlanId)));
+
+    return NextResponse.json({ 
+      message: 'Custom insurance deleted successfully' 
+    });
+  } catch (error) {
+    console.error('Error deleting custom insurance:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete custom insurance' },
       { status: 500 }
     );
   }
