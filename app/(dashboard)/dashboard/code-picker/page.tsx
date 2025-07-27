@@ -202,7 +202,10 @@ export default function CodePickerPage() {
       <div className="p-6 max-w-2xl mx-auto">
         <div className="text-center py-8">
           <p className="text-gray-600 mb-4">No doctors found. Please add doctors first.</p>
-          <Button onClick={() => window.location.href = '/dashboard/doctors'}>
+          <Button 
+            onClick={() => window.location.href = '/dashboard/doctors'}
+            className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 hover:text-gray-900 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-300/50"
+          >
             Go to Doctors Page
           </Button>
         </div>

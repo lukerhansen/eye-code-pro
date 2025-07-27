@@ -14,12 +14,12 @@ import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
 import { removeTeamMember, inviteTeamMember, updateTeamState, updateTeamName } from '@/app/(login)/actions';
 import useSWR from 'swr';
-import { Suspense, startTransition, useEffect } from 'react';
+import { Suspense, startTransition, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, PlusCircle, MapPin, Building2 } from 'lucide-react';
+import { Loader2, PlusCircle, MapPin, Building2, MessageCircle, Mail, Copy, Check } from 'lucide-react';
 
 type ActionState = {
   error?: string;
@@ -535,6 +535,66 @@ function InviteTeamMember() {
   );
 }
 
+function ContactSupport() {
+  const [showEmail, setShowEmail] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText('eyecodepro@gmail.com');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Card className="mt-12 bg-white/60 backdrop-blur-sm border-gray-200/50 rounded-3xl">
+      <CardContent className="pt-6 pb-6">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 mx-auto">
+            <MessageCircle className="h-6 w-6 text-teal-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Need Help?</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Our support team is here to assist you with any questions about EyeCodePro
+            </p>
+          </div>
+          {!showEmail ? (
+            <Button
+              onClick={() => setShowEmail(true)}
+              className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Contact Support
+            </Button>
+          ) : (
+            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center justify-center gap-2 bg-gray-50 rounded-lg px-4 py-3">
+                <Mail className="h-4 w-4 text-gray-500" />
+                <span className="font-mono text-sm text-gray-700">eyecodepro@gmail.com</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCopy}
+                  className="ml-2 hover:bg-gray-200"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500">
+                We typically respond within 24 hours
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function SettingsPage() {
   return (
     <section className="flex-1 p-4 lg:p-8 relative">
@@ -556,6 +616,7 @@ export default function SettingsPage() {
         {/* <Suspense fallback={<InviteTeamMemberSkeleton />}>
           <InviteTeamMember />
         </Suspense> */}
+        <ContactSupport />
       </div>
     </section>
   );

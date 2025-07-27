@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,21 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
     mode === 'signin' ? signIn : signUp,
     { error: '' }
   );
+  const [checkboxError, setCheckboxError] = useState<string | null>(null);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (mode === 'signup') {
+      const formData = new FormData(e.currentTarget);
+      const acceptTos = formData.get('acceptTos');
+      
+      if (!acceptTos) {
+        e.preventDefault();
+        setCheckboxError('Please check this box if you want to proceed');
+        return;
+      }
+    }
+    setCheckboxError(null);
+  };
 
   return (
     <div className="relative min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
@@ -45,7 +60,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
 
       <div className="relative mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8">
-          <form className="space-y-6" action={formAction}>
+          <form className="space-y-6" action={formAction} onSubmit={handleSubmit}>
           <input type="hidden" name="redirect" value={redirect || ''} />
           <input type="hidden" name="priceId" value={priceId || ''} />
           <input type="hidden" name="inviteId" value={inviteId || ''} />
@@ -102,7 +117,6 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 <Checkbox
                   id="acceptTos"
                   name="acceptTos"
-                  required
                   className="h-4 w-4 text-teal-600 focus:ring-teal-500/20 border-gray-200 rounded"
                 />
               </div>
@@ -121,7 +135,11 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
             </div>
           )}
 
-          {state?.error && (
+          {checkboxError && mode === 'signup' && (
+            <div className="text-red-500 text-sm ml-7">{checkboxError}</div>
+          )}
+          
+          {state?.error && !state.error.includes('Terms of Service') && (
             <div className="text-red-500 text-sm">{state.error}</div>
           )}
 

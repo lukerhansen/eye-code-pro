@@ -15,8 +15,8 @@ export default function TermsOfServicePage() {
               {/* 1. Acceptance */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                By accessing or using the website, application, widgets, plug‑ins or any related services (collectively, the
-                <strong>“Service”</strong>) provided by <strong>Eye‑Code Solutions, Inc.</strong> ("<strong>Company</strong>", “we,” “our,” or “us”), you (<strong>“you” or “User”</strong>) acknowledge that you have read, understood, and agree to be bound by these Terms of Service (<strong>“Terms”</strong>). If you do not agree to these Terms, you must not access or use the Service.
+                By accessing or using the website, application, widgets, plug‑ins or any related services (collectively, the{" "}
+                <strong>“Service”</strong>) provided by <strong>EyeCodePro</strong> ("<strong>Company</strong>", “we,” “our,” or “us”), you (<strong>“you” or “User”</strong>) acknowledge that you have read, understood, and agree to be bound by these Terms of Service (<strong>“Terms”</strong>). If you do not agree to these Terms, you must not access or use the Service.
               </p>
 
               {/* 2. Definitions */}
@@ -33,7 +33,7 @@ export default function TermsOfServicePage() {
                 You represent and warrant that (i) you are at least 18&nbsp;years old, (ii) you have the authority to enter into these Terms on behalf of any clinic, practice, or other entity you represent, and (iii) all registration information you provide is accurate and complete. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
               </p>
 
-              {/* 4. Subscription & Fees */}
+              {/* 4. Subscription & Payment */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">4. Subscription & Payment</h2>
               <p className="text-gray-700 mb-4">
                 Access to certain features of the Service may require the purchase of a subscription or payment of usage‑based fees (“<strong>Subscription</strong>”). All fees are quoted and payable in U.S.&nbsp;Dollars, are non‑refundable except as required by law, and are exclusive of all taxes. Subscriptions renew automatically unless cancelled in accordance with Section&nbsp;15 (Termination).
@@ -78,7 +78,7 @@ export default function TermsOfServicePage() {
               {/* 11. Disclaimer of Warranties */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">11. Disclaimer of Warranties</h2>
               <p className="text-gray-700 mb-4">
-                THE SERVICE IS PROVIDED ON AN “AS‑IS” AND “AS‑AVAILABLE” BASIS. COMPANY EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, NON‑INFRINGEMENT, OR THAT THE SERVICE WILL BE uninterrupted, SECURE, OR ERROR‑FREE.
+                THE SERVICE IS PROVIDED ON AN “AS‑IS” AND “AS‑AVAILABLE” BASIS. COMPANY EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, NON‑INFRINGEMENT, OR THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR ERROR‑FREE.
               </p>
 
               {/* 12. Limitation of Liability */}
@@ -108,7 +108,7 @@ export default function TermsOfServicePage() {
               {/* 16. Governing Law & Dispute Resolution */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">16. Governing Law & Dispute Resolution</h2>
               <p className="text-gray-700 mb-4">
-                These Terms and any dispute related to the Service will be governed by and construed in accordance with the laws of the State of California, without regard to its conflict‑of‑law rules. Any dispute, controversy, or claim shall be finally resolved by binding arbitration in San&nbsp;Francisco&nbsp;County, California, administered by the American Arbitration Association under its Commercial Arbitration Rules.
+                These Terms and any dispute related to the Service will be governed by and construed in accordance with the laws of the State of Utah, without regard to its conflict‑of‑law rules. Any dispute, controversy, or claim shall be finally resolved by binding arbitration in Carbon&nbsp;County, Utah, administered by the American Arbitration Association under its Commercial Arbitration Rules.
               </p>
 
               {/* 17. Severability */}
@@ -126,7 +126,9 @@ export default function TermsOfServicePage() {
               {/* 19. Contact Information */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">19. Contact Us</h2>
               <p className="text-gray-700 mb-4">
-                For questions about these Terms, please email us at <a href="mailto:support@eyecodesolutions.com" className="text-blue-600 underline">support@eyecodesolutions.com</a> or mail: Eye‑Code Solutions, Inc., 123 Market&nbsp;St.&nbsp;Suite&nbsp;400, San&nbsp;Francisco, CA&nbsp;94105.
+                For questions about these Terms, please email us at{" "}
+                <a href="mailto:eyecodepro@gmail.com" className="text-blue-600 underline">eyecodepro@gmail.com</a> or mail:{" "}
+                <span className="whitespace-nowrap">EyeCodePro</span>, 1600&nbsp;North&nbsp;550&nbsp;West, Price, UT&nbsp;84501.
               </p>
             </div>
           </div>

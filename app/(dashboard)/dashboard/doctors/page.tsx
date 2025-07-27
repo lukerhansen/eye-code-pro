@@ -259,7 +259,7 @@ export default function DoctorsPage() {
               </p>
               <Button
                 onClick={() => window.location.href = '/pricing'}
-                className="bg-teal-600 hover:bg-teal-700 text-white"
+                className="bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 View Pricing Plans
               </Button>
