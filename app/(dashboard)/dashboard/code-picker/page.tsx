@@ -432,21 +432,30 @@ export default function CodePickerPage() {
                   }
                 </div>
               </div>
+              
+              {/* Flag button - subtle placement */}
+              {billingEntryId && !isFlagged && (
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <button
+                    className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                    onClick={handleFlag}
+                  >
+                    <Flag className="h-3 w-3" />
+                    <span>Flag as incorrect</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Flag button */}
-      {billingEntryId && !isFlagged && (
-        <Button
-          variant="outline"
-          className="mt-4 flex items-center gap-2 border-red-500 text-red-600"
-          onClick={handleFlag}
-        >
-          <Flag className="h-5 w-5" /> Flag as incorrect
-        </Button>
-      )}
+      {/* Compliance caveat */}
+      <div className="mt-8 pt-6 border-t border-gray-200">
+        <p className="text-xs text-gray-500 text-center">
+          EyeCodePro uses insurance fee schedules to pick between E/M codes and eye codes to maximize revenue. For compliance, charting on all exams should comply with E/M requirements. If charting meets E/M requirements then the decision on which code to pick can be based on maximizing revenue.
+        </p>
+      </div>
     </div>
   );
 } 

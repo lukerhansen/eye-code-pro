@@ -75,7 +75,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [practiceName, setPracticeName] = useState('');
-  const [state, setState] = useState('UT'); // Default to Utah
+  const [state, setState] = useState(''); // No default state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
 
@@ -118,6 +118,12 @@ export default function OnboardingPage() {
 
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate that a state is selected
+    if (!state) {
+      return;
+    }
+    
     setIsSubmitting(true);
 
     const formData = new FormData();
