@@ -69,6 +69,11 @@ export default function TermsOfServicePage() {
                 The Service is designed to assist with CPT® code selection and reimbursement optimization; however, <strong>Company does not guarantee compliance with payer policies or government regulations</strong>. You remain solely responsible for all claims submitted to third‑party payers, as well as for responding to any audits, overpayment demands, or compliance inquiries. Company will not be liable for fines, penalties, claw‑backs, or other losses arising from your billing activities.
               </p>
 
+              {/* Code Selection Compliance */}
+              <p className="text-gray-700 mb-4">
+                EyeCodePro uses insurance fee schedules to pick between E/M codes and eye codes to maximize revenue. For compliance, charting on all exams should comply with E/M requirements. If charting meets E/M requirements then the decision on which code to pick can be based on maximizing revenue.
+              </p>
+
               {/* 10. Medical Disclaimer */}
               <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-4">10. Medical Disclaimer</h2>
               <p className="text-gray-700 mb-4">

@@ -74,7 +74,11 @@ export default function DoctorsPage() {
       
       if (response.ok) {
         setDoctors([...doctors, data.doctor]);
-        setUsage({ ...usage, current: usage.current + 1 });
+        setUsage({ 
+          ...usage, 
+          current: usage.current + 1,
+          displayed: usage.current + 1 <= usage.limit ? usage.displayed + 1 : usage.displayed
+        });
         setIsAddDialogOpen(false);
         setFormData({ name: '', degree: '' });
       } else if (response.status === 403) {
@@ -124,7 +128,11 @@ export default function DoctorsPage() {
       
       if (response.ok) {
         setDoctors(doctors.filter(d => d.id !== doctor.id));
-        setUsage({ ...usage, current: usage.current - 1 });
+        setUsage({ 
+          ...usage, 
+          current: usage.current - 1,
+          displayed: usage.displayed > 0 ? usage.displayed - 1 : 0
+        });
       }
     } catch (error) {
       console.error('Error deleting doctor:', error);
