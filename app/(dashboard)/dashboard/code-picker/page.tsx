@@ -26,7 +26,7 @@ export default function CodePickerPage() {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [acceptedInsurances, setAcceptedInsurances] = useState<InsurancePlan[]>([]);
   const [selectedInsurance, setSelectedInsurance] = useState<InsurancePlan | null>(null);
-  const [freeExamBilled, setFreeExamBilled] = useState<boolean>(true);
+  const [freeExamBilled, setFreeExamBilled] = useState<boolean>(false);
   const [isEmergencyVisit, setIsEmergencyVisit] = useState<boolean>(false);
   const [patientType, setPatientType] = useState<"new" | "established">("new");
   const [level, setLevel] = useState<number>(4);
