@@ -33,15 +33,14 @@ export default function HomePage() {
           <div className="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
             <div className="lg:col-span-7">
               <h1 className="text-5xl font-light text-gray-900 tracking-tight sm:text-6xl">
-                Auto-rank CPT codes.
+                92 or 99?
                 <span className="block font-normal text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
-                  Maximize revenue.
+                  Eye Code or E&M?
                 </span>
               </h1>
-              
+
               <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-                Point-of-care intelligence that instantly selects the highest-value CPT code 
-                for every patient visit. Built on each payer's specific rules.
+                Stop guessing. We tell you which code pays more for every insurance—instantly.
               </p>
               
               <div className="mt-10">
@@ -50,7 +49,7 @@ export default function HomePage() {
                     size="lg"
                     className="px-8 py-6 text-base font-medium rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                   >
-                    Start Saving Today
+                    Start Increasing Profits Now
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </a>
@@ -144,11 +143,10 @@ export default function HomePage() {
                   <TrendingUp className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">
-                  Immediate financial lift
+                  Capture thousands Annually
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Auto-ranks 92 vs 99 codes by current fee schedule for each payer, 
-                  level, and patient type—before submission.
+                  Average practice seeing 30 exams/day captures thousands in year one by always billing the higher-paying code (92 vs 99). Most see results in the first week.
                 </p>
               </div>
             </div>
@@ -160,10 +158,10 @@ export default function HomePage() {
                   <GraduationCap className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">
-                  No expertise needed
+                  Zero Fee Schedule Memorization
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Anyone on the team can pick the right code—zero CPT® memorization required.
+                  Your staff doesn't need to know which insurance pays more for eye codes (92xxx) vs E&M codes (99xxx). Answer a few simple questions—we instantly show the winner.
                 </p>
               </div>
             </div>
@@ -175,10 +173,10 @@ export default function HomePage() {
                   <Zap className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">
-                  Point-of-care speed
+                  Same Work. Higher Pay.
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Staff answers simple questions. System returns the optimal code. No tables, no guesswork.
+                  You're already doing comprehensive exams. Stop accepting lower reimbursement when the exact same visit qualifies for a higher-paying code family.
                 </p>
               </div>
             </div>
@@ -192,7 +190,7 @@ export default function HomePage() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-12 shadow-xl border border-gray-100">
             <h2 className="text-3xl font-light text-gray-900 mb-4">
-              Start capturing revenue you're leaving on the table
+              Stop Leaving Money on the Table
             </h2>
             <p className="text-lg text-gray-600 mb-8">
               Join practices achieving 5% average revenue lift with zero additional effort
@@ -203,7 +201,7 @@ export default function HomePage() {
                   size="lg"
                   className="px-8 py-6 text-base font-medium rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Start Saving Today
+                  Start Increasing Profits Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </a>
