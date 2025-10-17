@@ -40,7 +40,7 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-                Stop guessing. We tell you which code pays more for every insurance—instantly.
+                Stop guessing. We tell you which code pays more for every insurance.
               </p>
               
               <div className="mt-10">
@@ -128,10 +128,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-light text-gray-900">
-              Transform chaos into confidence
+              The right code, right away
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Rules-driven workflow that adds dollars and removes anxiety
+              Rules-based workflow that boosts revenue and speeds billing
             </p>
           </div>
           
@@ -146,7 +146,7 @@ export default function HomePage() {
                   Capture thousands Annually
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Average practice seeing 30 exams/day captures thousands in year one by always billing the higher-paying code (92 vs 99). Most see results in the first week.
+                  Average practice captures thousands in year one by always billing the higher-paying code (92 vs 99). Most see results in the first week.
                 </p>
               </div>
             </div>
@@ -176,7 +176,7 @@ export default function HomePage() {
                   Same Work. Higher Pay.
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  You're already doing comprehensive exams. Stop accepting lower reimbursement when the exact same visit qualifies for a higher-paying code family.
+                  You're already doing comprehensive exams. Stop accepting lower reimbursement when the same visit qualifies for a higher-paying code family.
                 </p>
               </div>
             </div>
