@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { User } from '@/lib/db/schema';
+import DemoCodePicker from '@/components/demo-code-picker';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -82,6 +83,44 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Code Picker Section */}
+      <section className="relative py-20 bg-gradient-to-b from-white to-gray-50">
+        <div className="absolute inset-0 bg-grid-gray-100/30 [mask-image:radial-gradient(ellipse_at_center,white,transparent_70%)]" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-light text-gray-900 mb-3">
+              Try It Now
+              <span className="block font-normal text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
+                See it in action
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Experience how our tool automatically selects the highest-value CPT code based on insurance fee schedules.
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-3xl blur-3xl opacity-15" />
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 p-6 md:p-10">
+              <DemoCodePicker />
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <a href="/sign-up">
+              <Button
+                size="lg"
+                className="px-8 py-6 text-base font-medium rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Start Using With Your Practice Data
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
           </div>
         </div>
       </section>
