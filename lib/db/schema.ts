@@ -76,6 +76,17 @@ export const billingEntries = pgTable('billing_entries', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
+// Demo analytics for tracking landing page demo usage
+export const demoAnalytics = pgTable('demo_analytics', {
+  id: serial('id').primaryKey(),
+  doctorDegree: varchar('doctor_degree', { length: 20 }).notNull(),
+  insuranceName: varchar('insurance_name', { length: 100 }).notNull(),
+  patientType: varchar('patient_type', { length: 20 }).notNull(),
+  level: integer('level').notNull(),
+  recommendedCode: varchar('recommended_code', { length: 20 }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
 export const invitations = pgTable('invitations', {
   id: serial('id').primaryKey(),
   teamId: integer('team_id')
@@ -155,6 +166,8 @@ export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
 export type BillingEntry = typeof billingEntries.$inferSelect;
 export type NewBillingEntry = typeof billingEntries.$inferInsert;
+export type DemoAnalytic = typeof demoAnalytics.$inferSelect;
+export type NewDemoAnalytic = typeof demoAnalytics.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;

@@ -63,6 +63,24 @@ export default function DemoCodePicker() {
       setOutput(result.recommendedCode || "No CPT code available");
       setDiagnosisCode(result.diagnosisCode);
       setDebugInfo(result.debugInfo);
+
+      // Track demo usage analytics (fire-and-forget)
+      if (result.recommendedCode) {
+        fetch('/api/demo-analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            doctorDegree: selectedDoctor.degree,
+            insuranceName: selectedInsurance.name,
+            patientType,
+            level,
+            recommendedCode: result.recommendedCode,
+          }),
+        }).catch((error) => {
+          // Silently fail - don't interrupt user experience
+          console.error('Failed to track demo analytics:', error);
+        });
+      }
     }, 300);
   };
 
