@@ -96,8 +96,12 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## Support
 
-For support with CodeSelect, please contact our team at support@codeselect.com or visit our help center.
+For support with CodeSelect, please contact our team at support@eyecodepro.com or visit our help center.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+**Copyright © 2025 Eye Code Pro. All rights reserved.**
+
+This code is publicly available for viewing and evaluation purposes only. No license is granted to use, modify, or distribute this software without explicit written permission.
+
+**Interested in licensing EyeCodePro?** Contact us at licensing@eyecodepro.com
