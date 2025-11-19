@@ -1,6 +1,7 @@
-# EyeCodePro - Eye Care Insurance Code Platform
+# EyeCodePro - Eye Care Insurance Code Platform - https://eyecodepro.com/
 
 **EyeCodePro** is a sophisticated platform designed specifically for ophthalmologists and optometrists to streamline insurance code selection, reduce claim denials, and maximize practice revenue through AI-powered coding assistance.
+
 
 
 ## Features
